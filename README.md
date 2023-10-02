@@ -1,70 +1,71 @@
 # NoSQL
 OTUS education on 30.09.2023 — 04.04.2024
 
-### 01 - Введение в NOSQL. NOSQL vs RDBMS
+[Урок 01 - Введение в NOSQL. NOSQL vs RDBMS](https://github.com/ada04/NoSQL/tree/main/lesson01 "Введение в NOSQL. NOSQL vs RDBMS")
 
-### 02 - CAP теорема
+[Урок 02 - CAP теорема](https://github.com/ada04/NoSQL/tree/main/lesson02 "CAP теорема")
 
-### 03 - Базовые возможности mongodb
+[Урок 03 - Базовые возможности mongodb](https://github.com/ada04/NoSQL/tree/main/lesson03 "Базовые возможности mongodb")
 
-### 04 - Кластерные возможности mongodb
+[Урок 04 - Кластерные возможности mongodb](https://github.com/ada04/NoSQL/tree/main/lesson04 "Кластерные возможности mongodb")
 
-### 05 - Map-reduce & aggregation framework
+[Урок 05 - Map-reduce & aggregation framework](https://github.com/ada04/NoSQL/tree/main/lesson05 "Map-reduce & aggregation framework")
 
-### 06 - Оптимизация производительности mongodb
+[Урок 06 - Оптимизация производительности mongodb](https://github.com/ada04/NoSQL/tree/main/lesson06 "Оптимизация производительности mongodb")
 
-### 07 - Couchbase
+[Урок 07 - Couchbase](https://github.com/ada04/NoSQL/tree/main/lesson07 "Couchbase")
 
-### 08 - Cassandra: Distributed Key Value, Architecture
+[Урок 08 - Cassandra: Distributed Key Value, Architecture](https://github.com/ada04/NoSQL/tree/main/lesson08 "Cassandra: Distributed Key Value, Architecture")
 
-### 09 - Clickhouse
+[Урок 09 - Clickhouse](https://github.com/ada04/NoSQL/tree/main/lesson09 "Clickhouse")
 
-### 10 - Cassandra: System Components
+[Урок 10- - Cassandra: System Components](https://github.com/ada04/NoSQL/tree/main/lesson10 "Cassandra: System Components")
 
-### 11 - Cassandra: CQL and Java, Scala API
+[Урок 11 - Cassandra: CQL and Java, Scala API](https://github.com/ada04/NoSQL/tree/main/lesson11 "Cassandra: CQL and Java, Scala API")
 
-### 12 - Elasticsearch
+[Урок 12 - Elasticsearch](https://github.com/ada04/NoSQL/tree/main/lesson12 "Elasticsearch")
 
-### 13 - Cassandra: monitoring and problem solving
+[Урок 13 - Cassandra: monitoring and problem solving](https://github.com/ada04/NoSQL/tree/main/lesson13 "Cassandra: monitoring and problem solving")
 
-### 14 - Cassandra: company cases
+[Урок 14 - Cassandra: company cases](https://github.com/ada04/NoSQL/tree/main/lesson14 "Cassandra: company cases")
 
-### 15 - Redis. Часть 1
+[Урок 15 - Redis. Часть 1](https://github.com/ada04/NoSQL/tree/main/lesson15 "Redis. Часть 1")
 
-### 16 - Redis. Часть 2
+[Урок 16 - Redis. Часть 2](https://github.com/ada04/NoSQL/tree/main/lesson16 "Redis. Часть 2")
 
-### 17 - etcd
+[Урок 17 - etcd](https://github.com/ada04/NoSQL/tree/main/lesson17 "etcd")
 
-### 18 - Consul
+[Урок 18 - Consul](https://github.com/ada04/NoSQL/tree/main/lesson18 "Consul")
 
-### 19 - Foundation db
+[Урок 19 - Foundation db](https://github.com/ada04/NoSQL/tree/main/lesson19 "Foundation db")
 
-### 20 - Neo4j, часть 1
+[Урок 20 - Neo4j, часть 1](https://github.com/ada04/NoSQL/tree/main/lesson20 "Neo4j, часть 1")
 
-### 21 - Neo4j, часть 2
+[Урок 21 - Neo4j, часть 2](https://github.com/ada04/NoSQL/tree/main/lesson21 "Neo4j, часть 2")
 
-### 22 - Kafka
+[Урок 22 - Kafka](https://github.com/ada04/NoSQL/tree/main/lesson22 "Kafka")
 
-### 23 - RabbitMQ
+[Урок 23 - RabbitMQ](https://github.com/ada04/NoSQL/tree/main/lesson23 "RabbitMQ")
 
-### 24 - Hadoop File System
+[Урок 24 - Hadoop File System](https://github.com/ada04/NoSQL/tree/main/lesson24 "Hadoop File System")
 
-### 25 - s3
+[Урок 25 - s3](https://github.com/ada04/NoSQL/tree/main/lesson25 "s3")
 
-### 26 - Prometheus. Grafana
+[Урок 26 - Prometheus. Grafana](https://github.com/ada04/NoSQL/tree/main/lesson26 "Prometheus. Grafana")
 
-### 27 - Архитектура Tarantool
+[Урок 27 - Архитектура Tarantool](https://github.com/ada04/NoSQL/tree/main/lesson27 "Архитектура Tarantool")
 
-### 28 - Масштабирование Tarantool
+[Урок 28 - Масштабирование Tarantool](https://github.com/ada04/NoSQL/tree/main/lesson28 "Масштабирование Tarantool")
 
-### 29 - Google BigQuery
+[Урок 29 - Google BigQuery](https://github.com/ada04/NoSQL/tree/main/lesson29 "Google BigQuery")
 
-### 30 - Nosql в Яндекс облаке
+[Урок 30 - Nosql в Яндекс облаке](https://github.com/ada04/NoSQL/tree/main/lesson30 "Nosql в Яндекс облаке")
 
-### 31 - Nosql в SberCloud
+[Урок 31 - Nosql в SberCloud](https://github.com/ada04/NoSQL/tree/main/lesson31 "Nosql в SberCloud")
 
-### 32 - Проектная работа
-Темы для работы:
-1 вариант - Разработать и протестировать высоконагруженый отказоустойчивый кластер на любой NoSQL БД;
-2 вариант - Взять 2+ NoSQL БД, загрузить 10+ млн записей и провести масштабное исследование по скорости обработки запросов;
-3 вариант - Свой проект.
+[Урок 32 - Проектная работа](https://github.com/ada04/NoSQL/tree/main/lesson32 "Проектная работа")
+
+  Темы для работы:
+    1 вариант - Разработать и протестировать высоконагруженый отказоустойчивый кластер на любой NoSQL БД;
+    2 вариант - Взять 2+ NoSQL БД, загрузить 10+ млн записей и провести масштабное исследование по скорости обработки запросов;
+    3 вариант - Свой проект.

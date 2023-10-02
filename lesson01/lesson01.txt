@@ -1,0 +1,96 @@
+-- Установим GCloud
+-- https://cloud.google.com/sdk/docs/downloads-apt-get
+-- развернем ВМ
+gcloud beta compute --project=celtic-house-266612 instances create mongo --zone=us-central1-a --machine-type=e2-small --subnet=default --network-tier=PREMIUM --maintenance-policy=MIGRATE --service-account=933982307116-compute@developer.gserviceaccount.com --scopes=https://www.googleapis.com/auth/cloud-platform --image-family=ubuntu-2204-lts --image-project=ubuntu-os-cloud --boot-disk-size=10GB --boot-disk-type=pd-ssd --boot-disk-device-name=mongo --no-shielded-secure-boot --shielded-vtpm --shielded-integrity-monitoring --reservation-affinity=any
+
+gcloud compute ssh mongo
+-- ssh aeugene@ip
+
+-- протестим ssh 
+gcloud beta compute --project=celtic-house-266612 instances create sshtest --zone=us-central1-a --machine-type=e2-small --subnet=default --network-tier=PREMIUM --maintenance-policy=MIGRATE --service-account=933982307116-compute@developer.gserviceaccount.com --scopes=https://www.googleapis.com/auth/devstorage.read_only,https://www.googleapis.com/auth/logging.write,https://www.googleapis.com/auth/monitoring.write,https://www.googleapis.com/auth/servicecontrol,https://www.googleapis.com/auth/service.management.readonly,https://www.googleapis.com/auth/trace.append --image-family=ubuntu-2204-lts --image-project=ubuntu-os-cloud --boot-disk-size=10GB --boot-disk-type=pd-ssd --boot-disk-device-name=sshtest --no-shielded-secure-boot --shielded-vtpm --shielded-integrity-monitoring --reservation-affinity=any
+
+gcloud compute ssh sshtest
+
+gcloud compute instances list
+
+ssh aeugene@10.128.15.202
+
+ssh-keygen -t rsa
+-- запускаем агента, если не запущен
+eval `ssh-agent -s`
+ssh-add ~/.ssh/id_rsa
+
+-- добавим ключ в metadata
+
+ssh aeugene@10.128.15.202
+
+-- удалим тестовую ВМ
+gcloud compute instances delete sshtest
+
+
+-- Установим монго
+-- https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/
+-- https://stackoverflow.com/questions/63510212/mongod-command-on-linuxubuntu-spits-out-random-messages
+
+wget -qO - https://www.mongodb.org/static/pgp/server-7.0.asc | sudo apt-key add - && echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/7.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-7.0.list && sudo apt-get update && sudo apt-get install -y mongodb-org
+
+
+-- узнать запущена ли монга
+ps aux | grep mongo| grep -Ev "grep"
+
+-- создадим каталог для данных
+sudo mkdir /home/mongo && sudo mkdir /home/mongo/db1 && sudo chmod 777 /home/mongo/db1
+
+-- запустим монго с параметрами для этого каталога
+mongod --dbpath /home/mongo/db1 --port 27001 --fork --logpath /home/mongo/db1/db1.log --pidfilepath /home/mongo/db1/db1.pid
+ps aux | grep mongo| grep -Ev "grep" 
+
+mongosh --port 27001
+
+show dbs
+-- при первом обращении создается объект
+use otus
+show collections
+
+-- good
+db.test.insert({hello : "world"})
+show collections
+-- посмотрим, что в коллекции
+db.test.find()
+db.test.find({})
+
+gcloud compute instances delete mongo
+
+
+-- ЯО
+-- установка cli
+-- https://cloud.yandex.ru/docs/cli/operations/install-cli
+
+-- https://cloud.yandex.ru/docs/compute/concepts/vm-metadata
+!! not  --name pg-instance \
+!! --ssh-key ~/.ssh/aeugene.pub
+
+
+yc compute instance create \
+  --name pg-instance \
+  --hostname pg-instance \
+  --create-boot-disk size=15G,type=network-ssd,image-folder-id=standard-images,image-family=ubuntu-2204-lts \
+  --network-interface subnet-name=default-ru-central1-a,nat-ip-version=ipv4 \
+  --zone ru-central1-a \
+  --metadata-from-file ssh-keys=/home/aeugene/.ssh/aeugene.txt
+
+-- обратит внимание на aeugene.txt
+cat aeugene.txt
+
+yc compute instance get pg-instance
+yc compute instance get --full pg-instance
+
+
+ssh aeugene@158.160.123.222
+ssh yc-user@158.160.123.222
+ssh root@158.160.123.222
+ssh ubuntu@158.160.123.222
+
+
+-- пример гита
+https://github.com/aeuge/postgres16book/tree/main

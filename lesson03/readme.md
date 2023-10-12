@@ -134,12 +134,12 @@ lines 1-12/12 (END)
 
 Подключиться к MoтgoDB можно консольной утилитой `mongosh` (порт по умолчанию 27017)
 
-     mongosh localhost --port 27017 
+     mongosh
 
 ```bash
-ubuntu@srv-mongodb-01:~$ mongosh localhost --port 27017
-Current Mongosh Log ID: 6527fec7470fe25fc34bc67d
-Connecting to:          mongodb://127.0.0.1:27017/localhost?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.0.1
+ubuntu@srv-mongodb-01:~$ mongosh
+Current Mongosh Log ID: 6527ff00777d6f965d24ad69
+Connecting to:          mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.0.1
 Using MongoDB:          7.0.2
 Using Mongosh:          2.0.1
 
@@ -152,7 +152,7 @@ For mongosh info see: https://docs.mongodb.com/mongodb-shell/
    2023-10-12T14:03:44.846+00:00: vm.max_map_count is too low
 ------
 
-localhost>
+test>
 ```
 
 

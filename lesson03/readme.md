@@ -1,15 +1,16 @@
-## Урок 3 - Базовые возможности mongodb
-**материала урока**
+# Урок 3 - Базовые возможности mongodb
+
+[материал урока](lesson03.md)
 
 
-## Домашнее задание
-### Цель
+# Домашнее задание
+## Цель
 В результате выполнения ДЗ вы научитесь разворачивать MongoDB, заполнять данными и делать запросы.
 
 
-### Пошаговая инструкция выполнения домашнего задания:
+## Пошаговая инструкция выполнения домашнего задания:
 
-#### 1. Установка MongoDB в ВМ VK Cloud
+### 1. Установка MongoDB в ВМ VK Cloud
    
 https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-ubuntu/
 
@@ -74,11 +75,91 @@ ubuntu@srv-mongodb-01:~$
 
 ```
 
-#### 2. Запуск MongoDB Community Edition
+### 2. Запуск MongoDB Community Edition
+
+**Data Directory** `/var/lib/mongodb`
+
+**Log Directory** `/var/log/mongodb`
+
+**Configuration file** `/etc/mongod.conf`
+
+      cat /etc/mongod.conf
+
+__Добавить изменение локал на 0ю0ю0ю0__
+
+**Запуск MongoDB**
+
+      sudo systemctl start mongod
+
+Если появляется ошибка `Failed to start mongod.service: Unit mongod.service not found.` то 
+
+      sudo systemctl daemon-reload
+
+Проверяем, что MongoDB запустилась
+
+      sudo systemctl status mongod
+
+```bash
+ubuntu@srv-mongodb-01:~$ sudo systemctl status mongod
+● mongod.service - MongoDB Database Server
+     Loaded: loaded (/lib/systemd/system/mongod.service; disabled; vendor preset: enabled)
+     Active: active (running) since Thu 2023-10-12 14:03:43 UTC; 41s ago
+       Docs: https://docs.mongodb.org/manual
+   Main PID: 2316 (mongod)
+     Memory: 72.5M
+        CPU: 1.208s
+     CGroup: /system.slice/mongod.service
+             └─2316 /usr/bin/mongod --config /etc/mongod.conf
+
+Oct 12 14:03:43 srv-mongodb-01 systemd[1]: Started MongoDB Database Server.
+Oct 12 14:03:43 srv-mongodb-01 mongod[2316]: {"t":{"$date":"2023-10-12T14:03:43.477Z"},"s":"I",  "c":"CONTROL",  "id":7484500, "ctx":"main","msg":"En>
+lines 1-12/12 (END)
+```
+
+Настраиваем автозапуск сервиса MongoDB
+
+      sudo systemctl enable mongod
+
+Останов сервера MongoDB
+
+      sudo systemctl stop mongod
+
+Перезапуск сервера MongoDB
+
+      sudo systemctl restart mongod
+
+Просмотреть ошибки, сообщения можно в логе:
+
+      sudo tail -n 100 /var/log/mongodb/mongod.log
+
+Подключиться к MoтgoDB можно консольной утилитой `mongosh` (порт по умолчанию 27017)
+
+     mongosh localhost --port 27017 
+
+```bash
+ubuntu@srv-mongodb-01:~$ mongosh localhost --port 27017
+Current Mongosh Log ID: 6527fec7470fe25fc34bc67d
+Connecting to:          mongodb://127.0.0.1:27017/localhost?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.0.1
+Using MongoDB:          7.0.2
+Using Mongosh:          2.0.1
+
+For mongosh info see: https://docs.mongodb.com/mongodb-shell/
+
+------
+   The server generated these startup warnings when booting
+   2023-10-12T14:03:43.766+00:00: Using the XFS filesystem is strongly recommended with the WiredTiger storage engine. See http://dochub.mongodb.org/core/prodnotes-filesystem
+   2023-10-12T14:03:44.846+00:00: Access control is not enabled for the database. Read and write access to data and configuration is unrestricted
+   2023-10-12T14:03:44.846+00:00: vm.max_map_count is too low
+------
+
+localhost>
+```
 
 
-#### 2. Ззаполнение данными БД MongoDB
+### 3. Ззаполнение данными БД MongoDB
 
-#### 3. Написание запросов на выборку и обновление данных
 
-#### 4. Создание индексов и сравннение производительности.
+### 4. Написание запросов на выборку и обновление данных
+
+
+### 5. Создание индексов и сравннение производительности.

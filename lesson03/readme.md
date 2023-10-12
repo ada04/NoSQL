@@ -85,7 +85,10 @@ ubuntu@srv-mongodb-01:~$
 
       cat /etc/mongod.conf
 
-__Добавить изменение локал на 0ю0ю0ю0__
+**Если хотим подключаться напрямую с удалённого хоста, необходимо изменить конфигурационный файл (можно сделать на любом этапе)
+
+     sudo mv /etc/mongod.conf /etc/mongod.old
+     sudo sh -c "sed 's/  bindIp: 127.0.0.1/#  bindIp: 127.0.0.1\n  bindIp: 0.0.0.0/' /etc/mongod.old > /etc/mongod.conf"
 
 **Запуск MongoDB**
 
@@ -158,6 +161,17 @@ test>
 
 ### 3. Заполнение данными БД MongoDB
 
+Для импорта данных необходимо установить [DatabaseTools] (https://www.mongodb.com/docs/database-tools/installation/installation/)
+
+      sudo dpkg -l mongodb-database-tools
+
+Создаём пользователя для подключения к Mongo
+
+      db.createUser({user: "admin",	pwd: "masterkey",	roles:[{role: "userAdmin" , db:"mydb"}]})
+
+Строка подключения для текущей конфигурации выглядит так:
+
+      mongodb://admin:masterkey@79.137.175.48:27017/mydb
 
 ### 4. Написание запросов на выборку и обновление данных
 

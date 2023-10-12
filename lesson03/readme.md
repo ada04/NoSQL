@@ -132,7 +132,7 @@ lines 1-12/12 (END)
 
       sudo tail -n 100 /var/log/mongodb/mongod.log
 
-Подключиться к MoтgoDB можно консольной утилитой `mongosh` (порт по умолчанию 27017)
+Подключиться к MongoDB можно консольной утилитой `mongosh` (порт по умолчанию 27017)
 
      mongosh
 
@@ -156,10 +156,26 @@ test>
 ```
 
 
-### 3. Ззаполнение данными БД MongoDB
+### 3. Заполнение данными БД MongoDB
 
 
 ### 4. Написание запросов на выборку и обновление данных
 
 
 ### 5. Создание индексов и сравннение производительности.
+
+### 6. Удаление MongoDB
+
+Останавливаем службу
+
+      sudo service mongod stop
+
+Удаляем пакеты
+
+      sudo apt-get purge mongodb-org*
+
+Удаляем каталоги
+
+      sudo rm -r /var/log/mongodb
+      sudo rm -r /var/lib/mongodb
+

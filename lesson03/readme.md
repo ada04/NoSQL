@@ -277,11 +277,11 @@ db.getCollection('reviews')
 Результат этих запросов одинаковый
 ![image](https://github.com/ada04/NoSQL/assets/40420948/4eeae7a4-9532-45a3-9076-4c49b45ecf20)
 
-**select * from listings***
+**SELECT * from listings***
 
       db.listings.find()
 
-**select id, name, bedrooms, beds, price, review_scores_rating from listings**
+**SELECT id, name, bedrooms, beds, price, review_scores_rating from listings**
 
       db.listings.find({}, {id: 1, name: 1, bedrooms: 1, beds: 1, price: 1, review_scores_rating: 1})
 
@@ -309,10 +309,14 @@ db.getCollection('reviews')
 
       db.listings.find({ $and: [{bedrooms: { $in: [4, 5]}}, {review_scores_rating: { $gt: 4.95}}]}, {id: 1, name: 1, bedrooms: 1, beds: 1, price: 1, review_scores_rating: 1}).sort({ 'price': -1}).limit(2)
 
+**select count(*) from listings where review_scores_rating > 4,95**
+
+      db.listings.find({review_scores_rating: { $gt: 4.95}}).count()
 
 
 ### 5. Создание индексов и сравннение производительности.
 
+[Вариант 1](./idx_calendar.md)
 
 ### 6. Удаление MongoDB
 

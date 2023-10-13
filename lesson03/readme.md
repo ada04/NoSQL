@@ -179,11 +179,93 @@ admin> db.createUser( { user: "dba", pwd: "otus", roles: [ "userAdminAnyDatabase
 
       mongodb://dba:otus@79.137.175.48:27017/admin
 
+**Загружаем файл с демо данными**
+
+Производить загрузку данных будем на сервере. Для начала загрузим архивы с данными.
+
+      wget http://data.insideairbnb.com/united-states/ma/cambridge/2023-09-23/data/listings.csv.gz http://data.insideairbnb.com/united-states/ma/cambridge/2023-09-23/data/calendar.csv.gz http://data.insideairbnb.com/united-states/ma/cambridge/2023-09-23/data/reviews.csv.gz
+
+Разархивируем все архивы
+
+      gunzip listings.csv.gz calendar.csv.gz reviews.csv.gz
+
+И запустим импорт данных в MongoDB
+
+```bash
+mongoimport -d mydb -c listings --type csv --file listings.csv --headerline
+mongoimport -d mydb -c calendar --type csv --file calendar.csv --headerline
+mongoimport -d mydb -c reviews --type csv --file reviews.csv --headerline
+```
+
+Результат импорта должен выглядеть примерно так:
+```bash
+ubuntu@srv-mongodb-01:/nfs$ mongoimport -d mydb -c listings --type csv --file listings.csv --headerline
+2023-10-13T13:10:29.684+0000    connected to: mongodb://localhost/
+2023-10-13T13:10:30.014+0000    1054 document(s) imported successfully. 0 document(s) failed to import.
+
+ubuntu@srv-mongodb-01:/nfs$ mongoimport -d mydb -c calendar --type csv --file calendar.csv --headerline
+2023-10-13T13:11:13.765+0000    connected to: mongodb://localhost/
+2023-10-13T13:11:16.770+0000    [######..................] mydb.things  4.88MB/17.8MB (27.4%)
+2023-10-13T13:11:19.766+0000    [##############..........] mydb.things  10.7MB/17.8MB (59.8%)
+2023-10-13T13:11:22.766+0000    [######################..] mydb.things  17.0MB/17.8MB (95.5%)
+2023-10-13T13:11:23.126+0000    [########################] mydb.things  17.8MB/17.8MB (100.0%)
+2023-10-13T13:11:23.126+0000    384710 document(s) imported successfully. 0 document(s) failed to import.
+ubuntu@srv-mongodb-01:/nfs$ mongoimport -d mydb -c reviews --type csv --file reviews.csv --headerline
+2023-10-13T13:11:35.960+0000    connected to: mongodb://localhost/
+2023-10-13T13:11:37.883+0000    54870 document(s) imported successfully. 0 document(s) failed to import.
+ubuntu@srv-mongodb-01:/nfs$
+```
+
+Проверим загруженные данные:
+
+```sql
+ubuntu@srv-mongodb-01:/nfs$ mongosh
+Current Mongosh Log ID: 652945b067fa6762ad8db3be
+Connecting to:          mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.0.1
+Using MongoDB:          7.0.2
+Using Mongosh:          2.0.1
+
+For mongosh info see: https://docs.mongodb.com/mongodb-shell/
+
+------
+   The server generated these startup warnings when booting
+   2023-10-13T12:22:07.925+00:00: Using the XFS filesystem is strongly recommended with the WiredTiger storage engine. See http://dochub.mongodb.org/core/prodnotes-filesystem
+   2023-10-13T12:22:10.664+00:00: Access control is not enabled for the database. Read and write access to data and configuration is unrestricted
+   2023-10-13T12:22:10.664+00:00: vm.max_map_count is too low
+------
+
+test> show dbs
+admin   180.00 KiB
+config   72.00 KiB
+local    72.00 KiB
+mydb     25.08 MiB
+test> use mydb
+switched to db mydb
+mydb> show collections
+calendar
+listings
+reviews
+mydb> db.reviews.find().limit(1)
+[
+  {
+    _id: ObjectId("6529457af9d4a27ad6f89b99"),
+    listing_id: 8521,
+    id: 6009,
+    date: '2009-07-23',
+    reviewer_id: 25629,
+    reviewer_name: 'Mara',
+    comments: 'This is a fabulous apartment!  Great neighborhood, easy walk to Fresh Pond, great bread, and shops!  The apartment itself is gorgeous, light-filled, and Marc and Janet are wonderful hosts!  My son and I greatly enjoyed our short stay here and highly recommend these hosts, this apartment.'
+  }
+]
+mydb>
+```
 
 ### 4. Написание запросов на выборку и обновление данных
 
 
+
 ### 5. Создание индексов и сравннение производительности.
+
 
 ### 6. Удаление MongoDB
 

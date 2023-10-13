@@ -158,20 +158,27 @@ For mongosh info see: https://docs.mongodb.com/mongodb-shell/
 test>
 ```
 
-
 ### 3. Заполнение данными БД MongoDB
 
 Для импорта данных необходимо установить [DatabaseTools] (https://www.mongodb.com/docs/database-tools/installation/installation/)
 
       sudo dpkg -l mongodb-database-tools
 
-Создаём пользователя для подключения к Mongo
+Создаём пользователя для подключения к Mongo 
 
-      db.createUser({user: "admin",	pwd: "masterkey",	roles:[{role: "userAdmin" , db:"mydb"}]})
+      db.createUser( { user: "dba", pwd: "otus", roles: [ "userAdminAnyDatabase", "dbAdminAnyDatabase", "readWriteAnyDatabase" ] } )
+      
+```sql
+test> use admin
+switched to db admin
+admin> db.createUser( { user: "dba", pwd: "otus", roles: [ "userAdminAnyDatabase", "dbAdminAnyDatabase", "readWriteAnyDatabase" ] } )
+{ ok: 1 }
+```
 
 Строка подключения для текущей конфигурации выглядит так:
 
-      mongodb://admin:masterkey@79.137.175.48:27017/mydb
+      mongodb://dba:otus@79.137.175.48:27017/admin
+
 
 ### 4. Написание запросов на выборку и обновление данных
 

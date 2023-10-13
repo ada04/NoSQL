@@ -164,7 +164,7 @@ test>
 
       sudo dpkg -l mongodb-database-tools
 
-Создаём пользователя для подключения к Mongo 
+Создаём пользователя для подключения к Mongo (необязательно, если подключение будет только локальное)
 
       db.createUser( { user: "dba", pwd: "otus", roles: [ "userAdminAnyDatabase", "dbAdminAnyDatabase", "readWriteAnyDatabase" ] } )
       
@@ -261,6 +261,53 @@ mydb>
 ```
 
 ### 4. Написание запросов на выборку и обновление данных
+
+**Выборка всех значений коллекции**
+
+```
+db.reviews.find()
+```
+
+или
+
+```
+db.getCollection('reviews')
+```
+
+Результат этих запросов одинаковый
+![image](https://github.com/ada04/NoSQL/assets/40420948/4eeae7a4-9532-45a3-9076-4c49b45ecf20)
+
+**select * from listings***
+
+      db.listings.find()
+
+**select id, name, bedrooms, beds, price, review_scores_rating from listings**
+
+      db.listings.find({}, {id: 1, name: 1, bedrooms: 1, beds: 1, price: 1, review_scores_rating: 1})
+
+Если 1 заменить на 0, то это будет означать исключение этих столбцов из запроса
+
+      db.reviews.find({}, {id: 0, reviewer_id: 0}).limit(1)
+
+**SELECT id, name, bedrooms, beds, price, review_scores_rating from listings where review_scores_rating = 5**
+
+      db.listings.find({review_scores_rating: 5}, {id: 1, name: 1, bedrooms: 1, beds: 1, price: 1, review_scores_rating: 1}).limit(1)
+
+**SELECT id, name, bedrooms, beds, price, review_scores_rating from listings where review_scores_rating = 5**
+
+      db.listings.find({review_scores_rating: { $gt: 4.9}}, {id: 1, name: 1, bedrooms: 1, beds: 1, price: 1, review_scores_rating: 1}).limit(2)
+
+**SELECT id, name, bedrooms, beds, price, review_scores_rating from listings where bedrooms in (4, 5)**
+
+      db.listings.find({bedrooms: { $in: [4, 5]}}, {id: 1, name: 1, bedrooms: 1, beds: 1, price: 1, review_scores_rating: 1}).limit(2)
+
+**SELECT id, name, bedrooms, beds, price, review_scores_rating from listings where bedrooms in (4, 5) and review_scores_rating > 4,95**
+
+      db.listings.find({ $and: [{bedrooms: { $in: [4, 5]}}, {review_scores_rating: { $gt: 4.95}}]}, {id: 1, name: 1, bedrooms: 1, beds: 1, price: 1, review_scores_rating: 1}).limit(2)
+
+**SELECT id, name, bedrooms, beds, price, review_scores_rating from listings where bedrooms in (4, 5) and review_scores_rating > 4,95 order by price desc**
+
+      db.listings.find({ $and: [{bedrooms: { $in: [4, 5]}}, {review_scores_rating: { $gt: 4.95}}]}, {id: 1, name: 1, bedrooms: 1, beds: 1, price: 1, review_scores_rating: 1}).sort({ 'price': -1}).limit(2)
 
 
 

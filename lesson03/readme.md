@@ -316,7 +316,14 @@ db.getCollection('reviews')
 
 ### 5. Создание индексов и сравннение производительности.
 
+
+```
+db.calendar.find({ available: 'f'}).explain("executionStats")
+```
+
 [Вариант 1](./idx_calendar.md)
+[Вариант 2](./idx_calen_date.md)
+
 
 ### 6. Удаление MongoDB
 

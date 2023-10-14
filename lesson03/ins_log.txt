@@ -1,0 +1,83 @@
+mydb> db.reviews.find({ $and:  [{date: '2016-07-17'}, {listing_id: 8521}]})
+[
+  {
+    _id: ObjectId("652960d9c5aac3a774f9d99d"),
+    listing_id: 8521,
+    id: 86887617,
+    date: '2016-07-17',
+    reviewer_id: 14876170,
+    reviewer_name: 'Holly',
+    comments: "We had a wonderful stay at Janet's apartment in Cambridge. The neighbourhood was quiet and pretty, with good transport links, and some great restaurants and shops just a few minutes walk away. We must recommend the Full Moon restaurant, especially if you have children, best breakfast on our whole vacation! We only wishes we'd found it sooner. The apartment itself was spotless, and very comfortable. We were very warmly welcomed by Janet, who was very kind and considerate. If visiting the area again, we would certainly want to stay in Sunsplashed for a second time!"
+  }
+]
+mydb> db.reviews.insertOne( { listing_id: 8521, date: '2016-07-17', reviewer_id: 1, reviewer_name: 'Otus', comments: "Hi, I'm Otus!"})
+{
+  acknowledged: true,
+  insertedId: ObjectId("652a2e7dc8ba21d9786b9d8c")
+}
+mydb> db.reviews.find({ $and:  [{date: '2016-07-17'}, {listing_id: 8521}]})
+[
+  {
+    _id: ObjectId("652960d9c5aac3a774f9d99d"),
+    listing_id: 8521,
+    id: 86887617,
+    date: '2016-07-17',
+    reviewer_id: 14876170,
+    reviewer_name: 'Holly',
+    comments: "We had a wonderful stay at Janet's apartment in Cambridge. The neighbourhood was quiet and pretty, with good transport links, and some great restaurants and shops just a few minutes walk away. We must recommend the Full Moon restaurant, especially if you have children, best breakfast on our whole vacation! We only wishes we'd found it sooner. The apartment itself was spotless, and very comfortable. We were very warmly welcomed by Janet, who was very kind and considerate. If visiting the area again, we would certainly want to stay in Sunsplashed for a second time!"
+  },
+  {
+    _id: ObjectId("652a2e7dc8ba21d9786b9d8c"),
+    listing_id: 8521,
+    date: '2016-07-17',
+    reviewer_id: 1,
+    reviewer_name: 'Otus',
+    comments: "Hi, I'm Otus!"
+  }
+]
+mydb> db.reviews.insertMany( [{ listing_id: 8521, date: '2016-07-17', reviewer_id: 2, reviewer_name: 'Otus2', comments: "Hi, I'm Otus2!"}, { listing_id: 8521, date: '2016-07-17', reviewer_id: 2, reviewer_name: 'Otus3', comments: "Hi, I'm Otus3!"} ] )
+{
+  acknowledged: true,
+  insertedIds: {
+    '0': ObjectId("652a2edec8ba21d9786b9d8d"),
+    '1': ObjectId("652a2edec8ba21d9786b9d8e")
+  }
+}
+mydb>  db.reviews.find({ $and:  [{date: '2016-07-17'}, {listing_id: 8521}]})
+[
+  {
+    _id: ObjectId("652960d9c5aac3a774f9d99d"),
+    listing_id: 8521,
+    id: 86887617,
+    date: '2016-07-17',
+    reviewer_id: 14876170,
+    reviewer_name: 'Holly',
+    comments: "We had a wonderful stay at Janet's apartment in Cambridge. The neighbourhood was quiet and pretty, with good transport links, and some great restaurants and shops just a few minutes walk away. We must recommend the Full Moon restaurant, especially if you have children, best breakfast on our whole vacation! We only wishes we'd found it sooner. The apartment itself was spotless, and very comfortable. We were very warmly welcomed by Janet, who was very kind and considerate. If visiting the area again, we would certainly want to stay in Sunsplashed for a second time!"
+  },
+  {
+    _id: ObjectId("652a2e7dc8ba21d9786b9d8c"),
+    listing_id: 8521,
+    date: '2016-07-17',
+    reviewer_id: 1,
+    reviewer_name: 'Otus',
+    comments: "Hi, I'm Otus!"
+  },
+  {
+    _id: ObjectId("652a2edec8ba21d9786b9d8d"),
+    listing_id: 8521,
+    date: '2016-07-17',
+    reviewer_id: 2,
+    reviewer_name: 'Otus2',
+    comments: "Hi, I'm Otus2!"
+  },
+  {
+    _id: ObjectId("652a2edec8ba21d9786b9d8e"),
+    listing_id: 8521,
+    date: '2016-07-17',
+    reviewer_id: 2,
+    reviewer_name: 'Otus3',
+    comments: "Hi, I'm Otus3!"
+  }
+]
+mydb>
+

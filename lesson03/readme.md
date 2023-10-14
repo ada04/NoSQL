@@ -315,17 +315,31 @@ db.getCollection('reviews')
 
 #### Insert
 
-db.reviews.find({ $and:  [{date: '2016-07-17'}, {listing_id: 8521}]})
+Смотрим состояние до вставки:
 
-db.reviews.insertOne( { listing_id: 8521, date: '2016-07-17', reviewer_id: 1, reviewer_name: 'Otus', comments: "Hi, I'm Otus!"})
+      db.reviews.find({ $and:  [{date: '2016-07-17'}, {listing_id: 8521}]})
 
-db.reviews.insertMany( [{ listing_id: 8521, date: '2016-07-17', reviewer_id: 2, reviewer_name: 'Otus2', comments: "Hi, I'm Otus2!"}, { listing_id: 8521, date: '2016-07-17', reviewer_id: 3, reviewer_name: 'Otus3', comments: "Hi, I'm Otus3!"} ] )
+Вставляем один документ
+
+      db.reviews.insertOne( { listing_id: 8521, date: '2016-07-17', reviewer_id: 1, reviewer_name: 'Otus', comments: "Hi, I'm Otus!"})
+
+Вставляем несколько документов
+
+      db.reviews.insertMany( [{ listing_id: 8521, date: '2016-07-17', reviewer_id: 2, reviewer_name: 'Otus2', comments: "Hi, I'm Otus2!"}, { listing_id: 8521, date: '2016-07-17', reviewer_id: 3, reviewer_name: 'Otus3', comments: "Hi, I'm Otus3!"} ] )
 
 [Log](./ins_log.txt)
 
 #### Delete
 
+Удаляем один документ
 
+      db.reviews.deleteOne( { listing_id: 8521, date: '2016-07-17', reviewer_id: 1, reviewer_name: 'Otus'})
+
+Удаляем несколько документов
+
+      db.reviews.deleteMany( { reviewer_id: { $in: [2, 3] } })
+      
+[Log](./del_log.txt)
 
 ### 5. Создание индексов и сравннение производительности.
 

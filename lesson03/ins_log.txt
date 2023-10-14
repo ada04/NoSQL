@@ -35,7 +35,7 @@ mydb> db.reviews.find({ $and:  [{date: '2016-07-17'}, {listing_id: 8521}]})
     comments: "Hi, I'm Otus!"
   }
 ]
-mydb> db.reviews.insertMany( [{ listing_id: 8521, date: '2016-07-17', reviewer_id: 2, reviewer_name: 'Otus2', comments: "Hi, I'm Otus2!"}, { listing_id: 8521, date: '2016-07-17', reviewer_id: 2, reviewer_name: 'Otus3', comments: "Hi, I'm Otus3!"} ] )
+mydb> db.reviews.insertMany( [{ listing_id: 8521, date: '2016-07-17', reviewer_id: 2, reviewer_name: 'Otus2', comments: "Hi, I'm Otus2!"}, { listing_id: 8521, date: '2016-07-17', reviewer_id: 3, reviewer_name: 'Otus3', comments: "Hi, I'm Otus3!"} ] )
 {
   acknowledged: true,
   insertedIds: {
@@ -74,7 +74,7 @@ mydb>  db.reviews.find({ $and:  [{date: '2016-07-17'}, {listing_id: 8521}]})
     _id: ObjectId("652a2edec8ba21d9786b9d8e"),
     listing_id: 8521,
     date: '2016-07-17',
-    reviewer_id: 2,
+    reviewer_id: 3,
     reviewer_name: 'Otus3',
     comments: "Hi, I'm Otus3!"
   }

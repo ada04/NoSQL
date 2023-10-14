@@ -319,7 +319,7 @@ db.reviews.find({ $and:  [{date: '2016-07-17'}, {listing_id: 8521}]})
 
 db.reviews.insertOne( { listing_id: 8521, date: '2016-07-17', reviewer_id: 1, reviewer_name: 'Otus', comments: "Hi, I'm Otus!"})
 
-db.reviews.insertMany( [{ listing_id: 8521, date: '2016-07-17', reviewer_id: 2, reviewer_name: 'Otus2', comments: "Hi, I'm Otus2!"}, { listing_id: 8521, date: '2016-07-17', reviewer_id: 2, reviewer_name: 'Otus3', comments: "Hi, I'm Otus3!"} ] )
+db.reviews.insertMany( [{ listing_id: 8521, date: '2016-07-17', reviewer_id: 2, reviewer_name: 'Otus2', comments: "Hi, I'm Otus2!"}, { listing_id: 8521, date: '2016-07-17', reviewer_id: 3, reviewer_name: 'Otus3', comments: "Hi, I'm Otus3!"} ] )
 
 [Log](./ins_log.txt)
 

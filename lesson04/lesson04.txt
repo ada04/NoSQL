@@ -1,0 +1,256 @@
+-- Репликасет
+-- развернем ВМ ubuntu focal 20-04 LTS e2-medium, иначе не хватит ресурсов
+-- --image-family=ubuntu-2004-lts
+gcloud beta compute --project=celtic-house-266612 instances create mongo --zone=us-central1-a --machine-type=e2-medium --subnet=default --network-tier=PREMIUM --maintenance-policy=MIGRATE --service-account=933982307116-compute@developer.gserviceaccount.com --scopes=https://www.googleapis.com/auth/cloud-platform --image-family=ubuntu-2004-lts --image-project=ubuntu-os-cloud --boot-disk-size=10GB --boot-disk-type=pd-ssd --boot-disk-device-name=mongo --no-shielded-secure-boot --shielded-vtpm --shielded-integrity-monitoring --reservation-affinity=any
+
+--ЯО
+yc compute instance create \
+  --name mongo-instance \
+  --hostname mongo-instance \
+  --create-boot-disk size=15G,type=network-ssd,image-folder-id=standard-images,image-family=ubuntu-2204-lts \
+  --network-interface subnet-name=default-ru-central1-a,nat-ip-version=ipv4 \
+  --zone ru-central1-a \
+  --metadata-from-file ssh-keys=/home/aeugene/.ssh/aeugene.txt
+
+ssh ubuntu@130.193.49.70
+
+
+gcloud compute ssh mongo
+
+-- https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/
+
+
+--Подготовим терраформ для развертывании в яо
+$Env:YC_TOKEN=$(yc iam create-token)
+$Env:YC_CLOUD_ID=$(yc config get cloud-id)
+$Env:YC_FOLDER_ID=$(yc config get folder-id)
+ terraform apply
+
+terraform apply
+
+-- установим mongo 6.0
+
+wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | sudo apt-key add - \
+&& echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list \
+&& apt update \
+&& apt-get install -y mongodb-org
+
+-- Replica set
+
+sudo mkdir /home/mongo &&  sudo mkdir /home/mongo/{db1,db2,db3,db4} && sudo chmod 777 /home/mongo/{db1,db2,db3,db4}
+mongod --dbpath /home/mongo/db1 --port 27001 --replSet RS --fork --logpath /home/mongo/db1/db1.log --pidfilepath /home/mongo/db1/db1.pid
+mongod --dbpath /home/mongo/db2 --port 27002 --replSet RS --fork --logpath /home/mongo/db2/db2.log --pidfilepath /home/mongo/db2/db2.pid
+mongod --dbpath /home/mongo/db3 --port 27003 --replSet RS --fork --logpath /home/mongo/db3/db3.log --pidfilepath /home/mongo/db3/db3.pid
+
+-- посмотрим, что процессу успешно запущены
+ps aux | grep mongo| grep -Ev "grep" 
+mongosh --port 27001
+> rs.status()
+
+-- проинициализируем кластер
+-- через некоторое время SECONDARY->PRIMARY
+> rs.initiate({"_id" : "RS", members : [{"_id" : 0, priority : 3, host : "127.0.0.1:27001"},
+{"_id" : 1, host : "127.0.0.1:27002"},
+{"_id" : 2, host : "127.0.0.1:27003", arbiterOnly : true}]});
+
+> rs.status()
+
+-- добавим 4 ноду
+
+mongod --dbpath /home/mongo/db4 --port 27004 --replSet RS --fork --logpath /home/mongo/db4/db4.log --pidfilepath /home/mongo/db4/db4.pid
+
+> rs.add("127.0.0.1:27004")
+> rs.addArb("localhost:27004") //если добавить арбитра
+> rs.remove("localhost:27002")
+> rs.remove("127.0.0.1:27002")
+> db.isMaster()
+
+mongosh --port 27002
+> db.isMaster()
+
+Проверяем вставку и чтение на мастере и реплике
+
+> db.user.insert({"name":"Ivan"},{writeConcern: {w: "majority", j: true, wtimeout: 500}})
+> db.user.find({"name":"Ivan"},{writeConcern: {w: "majority", j: true, wtimeout: 500}})
+> rs.slaveOk()
+> rs.secondaryOk()
+> use admin
+> db.shutdownServer() - потушить основной, затем арбитра и секондари
+
+---посмотреть время выполнения запроса
+> db.user.explain('executionStats').find({"name":"Ivan"},{writeConcern: {w: "majority", j: true, wtimeout: 500}})
+
+---посмотреть на поиск с writeConcern и без него
+db.user.find({"name":"Ivan"},{writeConcern: {w: "majority", j: true, wtimeout: 500}})
+db.user.find({"name":"Ivan"})
+
+terraform destroy
+
+
+---Шардирование--------
+-- Создадим 2 репликасета с шардами
+
+terraform apply
+-- установим mongo 6.0
+
+wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | sudo apt-key add - \
+&& echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list \
+&& apt update \
+&& apt-get install -y mongodb-org
+
+-- Создадим репликасет с конфигурацией шарда (обращаем внимание на --configsvr )
+sudo mkdir /home/mongo && sudo mkdir /home/mongo/{dbc1,dbc2,dbc3} && sudo chmod 777 /home/mongo/{dbc1,dbc2,dbc3}
+mongod --configsvr --dbpath /home/mongo/dbc1 --port 27001 --replSet RScfg --fork --logpath /home/mongo/dbc1/dbc1.log --pidfilepath /home/mongo/dbc1/dbc1.pid
+mongod --configsvr --dbpath /home/mongo/dbc2 --port 27002 --replSet RScfg --fork --logpath /home/mongo/dbc2/dbc2.log --pidfilepath /home/mongo/dbc2/dbc2.pid
+mongod --configsvr --dbpath /home/mongo/dbc3 --port 27003 --replSet RScfg --fork --logpath /home/mongo/dbc3/dbc3.log --pidfilepath /home/mongo/dbc3/dbc3.pid
+
+-- посмотрим, что процессу успешно запущены
+ps aux | grep mongo| grep -Ev "grep" 
+mongosh --port 27001
+rs.status()
+-- ошибка, так как шарды для конфигсервера не допускают арбитра
+rs.initiate({"_id" : "RScfg", configsvr: true, members : [{"_id" : 0, priority : 3, host : "127.0.0.1:27001"},{"_id" : 1, host : "127.0.0.1:27002"},{"_id" : 2, host : "127.0.0.1:27003", arbiterOnly : true}]});
+-- ок
+rs.initiate({"_id" : "RScfg", configsvr: true, members : [{"_id" : 0, priority : 3, host : "127.0.0.1:27001"},{"_id" : 1, host : "127.0.0.1:27002"},{"_id" : 2, host : "127.0.0.1:27003"}]});
+
+-- Создадим 2 репликасета
+
+sudo sudo mkdir /home/mongo/{db1,db2,db3,db4,db5,db6} && sudo chmod 777 /home/mongo/{db1,db2,db3,db4,db5,db6}
+mongod --shardsvr --dbpath /home/mongo/db1 --port 27011 --replSet RS1 --fork --logpath /home/mongo/db1/db1.log --pidfilepath /home/mongo/db1/db1.pid
+mongod --shardsvr --dbpath /home/mongo/db2 --port 27012 --replSet RS1 --fork --logpath /home/mongo/db2/db2.log --pidfilepath /home/mongo/db2/db2.pid
+mongod --shardsvr --dbpath /home/mongo/db3 --port 27013 --replSet RS1 --fork --logpath /home/mongo/db3/db3.log --pidfilepath /home/mongo/db3/db3.pid
+mongod --shardsvr --dbpath /home/mongo/db4 --port 27021 --replSet RS2 --fork --logpath /home/mongo/db4/db4.log --pidfilepath /home/mongo/db4/db4.pid
+mongod --shardsvr --dbpath /home/mongo/db5 --port 27022 --replSet RS2 --fork --logpath /home/mongo/db5/db5.log --pidfilepath /home/mongo/db5/db5.pid
+mongod --shardsvr --dbpath /home/mongo/db6 --port 27023 --replSet RS2 --fork --logpath /home/mongo/db6/db6.log --pidfilepath /home/mongo/db6/db6.pid
+
+ps aux | grep mongo| grep -Ev "grep" //посмотрим, что процессу успешно запущены
+mongosh --port 27011
+rs.initiate({"_id" : "RS1", members : [{"_id" : 0, priority : 3, host : "127.0.0.1:27011"},{"_id" : 1, host : "127.0.0.1:27012"},{"_id" : 2, host : "127.0.0.1:27013", arbiterOnly : true}]});
+
+mongosh --port 27021
+rs.initiate({"_id" : "RS2", members : [{"_id" : 0, priority : 3, host : "127.0.0.1:27021"},{"_id" : 1, host : "127.0.0.1:27022"},{"_id" : 2, host : "127.0.0.1:27023", arbiterOnly : true}]});
+
+-- Создадим шардированный кластер %)
+mongos --configdb RScfg/127.0.0.1:27001,127.0.0.1:27002,127.0.0.1:27003 --port 27000
+
+-- что не так??
+
+
+
+
+
+
+
+
+
+
+
+-- правильно, нужно форкнуть процесс
+
+-- запускаем в 2 экземплярах для отказоустойчивости
+mongos --configdb RScfg/127.0.0.1:27001,127.0.0.1:27002,127.0.0.1:27003 --port 27000 --fork --logpath /home/mongo/dbc1/dbs.log --pidfilepath /home/mongo/dbc1/dbs.pid 
+mongos --configdb RScfg/127.0.0.1:27001,127.0.0.1:27002,127.0.0.1:27003 --port 27100 --fork --logpath /home/mongo/dbc1/dbs2.log --pidfilepath /home/mongo/dbc1/dbs2.pid 
+
+
+mongosh --port 27000
+> sh.addShard("RS1/127.0.0.1:27011,127.0.0.1:27012,127.0.0.1:27013")
+> sh.addShard("RS2/127.0.0.1:27021,127.0.0.1:27022,127.0.0.1:27023")
+> sh.status()
+
+>db.adminCommand({ "setDefaultRWConcern": 1, "defaultWriteConcern": { "w": 1 }, "defaultReadConcern": { "level": "majority" } })
+
+-- посмотрим загрузку
+htop
+
+нагенерим данные
+> use bank
+> sh.enableSharding("bank")
+> use config
+> db.settings.updateOne(
+   { _id: "chunksize" },
+   { $set: { _id: "chunksize", value: 1 } },
+   { upsert: true }
+)
+> use bank
+for (var i=0; i<50000; i++) { db.tickets.insert({name: "Max ammout of cost tickets", amount: Math.random()*100}) }
+> db.tickets.createIndex({amount: 1})
+> db.tickets.stats()
+> 
+-- use admin
+-- db.runCommand({shardCollection: "bank.tickets", key: {amount: 1}})
+> sh.status()
+
+> sh.balancerCollectionStatus("bank.tickets")
+> sh.splitFind( "bank.tickets", { "amount": "50" } )
+
+
+-- права доступа
+sudo mkdir /home/mongo/db15 && sudo chmod 777 /home/mongo/db15
+mongod --dbpath /home/mongo/db15 --port 27005 --fork --logpath /home/mongo/db15/db5.log --pidfilepath /home/mongo/db15/db5.pid
+
+mongo --port 27005
+db = db.getSiblingDB("admin")
+db.createRole(
+    {      
+     role: "superRoot",      
+     privileges:[
+        { resource: {anyResource:true}, actions: ["anyAction"]}
+     ],      
+     roles:[] 
+    }
+)
+
+db.createUser({      
+     user: "companyDBA",      
+     pwd: "EWqeeFpUt9*8zq",      
+     roles: ["superRoot"] 
+})
+
+> use admin
+> db.system.roles.find()
+> db.system.users.find()
+> db.shutdownServer()
+-- запускаем сервер с аутентификацией
+mongod --dbpath /home/mongo/db15 --port 27005 --auth --fork --logpath /home/mongo/db15/db5.log --pidfilepath /home/mongo/db15/db5.pid
+
+mongo --port 27005
+
+mongo --port 27005 -u companyDBA -p EWqeeFpUt9*8zq --authenticationDatabase "admin"
+
+show databases
+
+
+
+-- вариант разместить простого пользователя и воспользоваться авторизацией
+
+use admin
+db.createUser({      
+     user: "webapiDBA",      
+     pwd: "EWqeeFpUt9*8zq",      
+     roles: [{role: "readWrite",db: "webapi"}] 
+})
+use webapi
+db.createUser({      
+     user: "webapiDBA2",      
+     pwd: "EWqeeFpUt9*8zq",      
+     roles: [{role: "readWrite",db: "webapi"}] 
+})
+
+mongo webapi --port 27005 -u webapiDBA -p EWqeeFpUt9*8zq --authenticationDatabase "admin"
+mongo webapi --port 27005 -u webapiDBA2 -p EWqeeFpUt9*8zq --authenticationDatabase "webapi"
+
+
+?? аналог .pgpass
+-- https://docs.mongodb.com/manual/core/security-x.509/
+
+-- перезапускаем без безопасности
+> use admin
+> db.shutdownServer()
+mongod --dbpath /home/mongo/db5 --port 27005 --fork --logpath /home/mongo/db5/db5.log --pidfilepath /home/mongo/db5/db5.pid
+
+mongo --port 27005
+
+
+
+-- удалим инстанс
+gcloud compute instances delete mongos

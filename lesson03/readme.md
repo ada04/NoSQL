@@ -100,6 +100,38 @@ security:
   authorization: "enabled"
 ```
 
+права доступа
+
+
+```
+mongo --port 27005
+db = db.getSiblingDB("admin")
+db.createRole(
+    {      
+     role: "superRoot",      
+     privileges:[
+        { resource: {anyResource:true}, actions: ["anyAction"]}
+     ],      
+     roles:[] 
+    }
+)
+
+db.createUser({      
+     user: "companyDBA",      
+     pwd: "EWqeeFpUt9*8zq",      
+     roles: ["superRoot"] 
+})
+
+> use admin
+> db.system.roles.find()
+> db.system.users.find()
+> db.shutdownServer()
+```
+
+      mongo --port 27005 -u companyDBA -p EWqeeFpUt9*8zq --authenticationDatabase "admin"
+
+
+
 **Запуск MongoDB**
 
       sudo systemctl start mongod

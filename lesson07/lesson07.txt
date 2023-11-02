@@ -1,0 +1,100 @@
+https://www.altoros.com/blog/nosql-comparison-2021-couchbase-server-mongodb-and-cassandra-datastax/
+
+-- couchbase
+-- развернем 4 ВМ
+-- ВМ минимум 4 гига памяти
+-- Ubuntu 20.04 
+-- 22.04 not supported
+-- https://docs.couchbase.com/server/current/install/install-platforms.html
+for i in {1..4}; do gcloud beta compute --project=celtic-house-266612 instances create cb$i --zone=europe-north1-a --machine-type=e2-medium --subnet=default --network-tier=PREMIUM --maintenance-policy=MIGRATE --service-account=933982307116-compute@developer.gserviceaccount.com --scopes=https://www.googleapis.com/auth/cloud-platform --image-family=ubuntu-2004-lts --image-project=ubuntu-os-cloud --boot-disk-size=10GB --boot-disk-type=pd-ssd --boot-disk-device-name=cb$i --no-shielded-secure-boot --shielded-vtpm --shielded-integrity-monitoring --reservation-affinity=any & done;
+
+
+gcloud compute instances list 
+
+-- проверим доступность
+gcloud compute ssh cb1
+
+-- install couchbase
+-- https://docs.couchbase.com/server/current/install/install-linux.html
+for i in {1..4}; do gcloud compute ssh cb$i --command='sudo apt-get update && sudo apt-get upgrade -y && curl -O https://packages.couchbase.com/releases/couchbase-release/couchbase-release-1.0-amd64.deb && sudo dpkg -i ./couchbase-release-1.0-amd64.deb && sudo apt-get update && sudo apt-get install couchbase-server -y' & done;
+
+-- важно дождаться окончания установки, иначе придется фиксить процесс инсталла - очень проблемно
+
+-- если вдруг ssl сертификат истек - добавим ключик k
+-- curl -O -k https://packages.couchbase.com/releases/couchbase-release/couchbase-release-1.0-amd64.deb
+
+
+gcloud compute ssh cb1
+-- проверим, запущен ли сервис
+sudo systemctl list-units --type service | grep couchbase
+
+
+- посмотрим доку по рекомендованным путям конфигурации кластера
+-- https://docs.couchbase.com/server/current/manage/manage-nodes/create-cluster.html
+
+gcloud compute instances list
+-- не забываем открыть порт в VPC
+-- имя кластера cb
+-- логин admin
+-- пароль admin123
+https://35.228.89.50:18091
+
+-- вместо IP используем fqdn, иначе не соберем
+-- cb1.us-central1-a.c.celtic-house-266612.internal
+cb1.europe-north1-a.c.celtic-house-266612.internal
+
+
+-- после настройки кластера сертификаты ssl выпустятся сами
+
+
+-- сервисы указываются ТОЛЬКО при добавлении машины в кластер
+-- иначе переинициализация
+
+-- добавим ноды в кластер по FQDN
+-- попробуем одну ноду добавить со всеми галочками
+
+
+
+-- если убрать ноду 
+-- https://docs.couchbase.com/server/current/cli/cbcli/couchbase-cli-rebalance.html
+-- couchbase-cli rebalance -c 192.168.1.5:8091 --username Administrator --password password --server-remove 192.168.1.6:8091,192.168.1.7:8091
+
+
+n1 language
+-- загрузим тестовые бакеты
+-- https://docs.couchbase.com/server/current/n1ql/n1ql-language-reference/selectintro.html
+
+
+https://docs.couchbase.com/server/current/n1ql/query.html
+
+-- посмотрим запросы в датасете про перевозки
+-- https://docs.couchbase.com/cloud/get-started/run-first-queries.html
+
+
+Increase ULIMIT in Production Deployments
+Couchbase Server normally expects the following changes to ulimits:
+ulimit -n 40960        # nofile: max number of open files
+ulimit -c unlimited    # core: max core file size
+ulimit -l unlimited    # memlock: maximum locked-in-memory addres
+
+
+-- восстановление нод
+https://docs.couchbase.com/server/current/manage/manage-nodes/recover-nodes.html
+
+-- автофейловер
+https://docs.couchbase.com/server/current/cli/cbcli/couchbase-cli-setting-autofailover.html
+
+
+-- мониторинг
+https://docs.couchbase.com/server/current/manage/monitor/monitoring-n1ql-query.html#sys-completed-req
+curl http://localhost:8093/admin/settings -u admin:admin123 \
+  -H 'Content-Type: application/json' \
+  -d '{"completed": {"-threshold": 1000}}'
+
+-- Перебалансировать кластер через couchbase-cli
+
+kosten@cb1:~$ couchbase-cli rebalance -c cb1.europe-west1-c.c.nosql-367017.internal:8091 --username admin --password admin123
+Rebalancing                                                                                         
+Bucket: 00/00 ()                                                                    0 docs remaining
+[==========================================================================================] 100.00%
+SUCCESS: Rebalance complete

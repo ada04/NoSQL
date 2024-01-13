@@ -477,3 +477,151 @@ WHERE (CounterID = 912887) AND (toYYYYMM(StartDate) = 201403)
 Полный лог создания БД и импорта: [Log](./out_02.log))
 Несмотря на большое количество записей и работу ClickHouse в ВМ на обычном ПК, время выполнения запросов составило 0.271 и 0.041 сек.
 
+## Создание дополнительной тестовой БД (https://clickhouse.com/docs/en/getting-started/example-datasets) , протестировать скорость запросов
+
+### Набор данных кулинарных рецептов
+
+Я выбрал БД "Набор данных кулинарных рецептов".
+
+Предварительно скачал файл, поэтому распаковываем и готовимся загружать.
+
+```bash
+unzip dataset.zip
+```
+
+#### Создадим БД и таблицу
+
+```sql
+CREATE DATABASE test2
+COMMENT 'Database for testb OTUS'
+
+CREATE TABLE test2.recipes
+(
+    title String,
+    ingredients Array(String),
+    directions Array(String),
+    link String,
+    source LowCardinality(String),
+    NER Array(String)
+) ENGINE = MergeTree ORDER BY title
+```
+
+#### Добавим данные в таблицу
+
+Чтобы добавить данные из файла full_dataset.csv в таблицу recipes, выполним команду:
+
+```bash
+clickhouse-client --query "
+    INSERT INTO test2.recipes
+    SELECT
+        title,
+        JSONExtract(ingredients, 'Array(String)'),
+        JSONExtract(directions, 'Array(String)'),
+        link,
+        source,
+        JSONExtract(NER, 'Array(String)')
+    FROM input('num UInt32, title String, ingredients String, directions String, link String, source LowCardinality(String), NER String')
+    FORMAT CSVWithNames
+" --input_format_with_names_use_header 0 --format_csv_allow_single_quote 0 --input_format_allow_errors_num 10 < dataset/full_dataset.csv --password aa2024
+```
+
+**Пояснение:**
+
+- набор данных представлен в формате CSV и требует некоторой предварительной обработки при вставке. Для предварительной обработки используется табличная функция input;
+- структура CSV-файла задается в аргументе табличной функции input;
+- поле num (номер строки) не нужно — оно считывается из файла, но игнорируется;
+- при загрузке используется FORMAT CSVWithNames, но заголовок в CSV будет проигнорирован (параметром командной строки --input_format_with_names_use_header 0), поскольку заголовок не содержит имени первого поля;
+- в файле CSV для разделения строк используются только двойные кавычки. Но некоторые строки не заключены в двойные кавычки, и чтобы одинарная кавычка не рассматривалась как заключающая, используется параметр --format_csv_allow_single_quote 0;
+- некоторые строки из CSV не могут быть считаны корректно, поскольку они начинаются с символов\M/, тогда как в CSV начинаться с обратной косой черты могут только символы \N, которые распознаются как NULL в SQL. Поэтому используется параметр --input_format_allow_errors_num 10, разрешающий пропустить до десяти некорректных записей;
+- массивы ingredients, directions и NER представлены в необычном виде: они сериализуются в строку формата JSON, а затем помещаются в CSV — тогда они могут считываться и обрабатываться как обычные строки (String). Чтобы преобразовать строку в массив, используется функция JSONExtract.
+
+#### Проверим добавленние данных
+
+Чтобы проверить добавленные данные, подсчитаем количество строк в таблице:
+
+```sql
+SELECT count()
+FROM test2.recipes
+```
+
+```
+Query id: b8885c20-2ba5-4ae4-a359-e947f7b0052f
+
+┌─count()─┐
+│ 2231142 │
+└─────────┘
+
+1 row in set. Elapsed: 0.002 sec.
+```
+
+#### Примеры запросов
+
+Самые упоминаемые ингридиенты в рецептах:
+
+```sql
+SELECT
+    arrayJoin(NER) AS ingridient,
+    count() AS cnt
+FROM test2.recipes
+GROUP BY ingridient
+ORDER BY cnt DESC
+LIMIT 10
+```
+
+```
+Query id: 49628135-2fd9-4e26-a40e-f8cff4e55db1
+
+┌─ingridient─┬────cnt─┐
+│ salt       │ 890741 │
+│ sugar      │ 620027 │
+│ butter     │ 493823 │
+│ flour      │ 466110 │
+│ eggs       │ 401276 │
+│ onion      │ 372469 │
+│ garlic     │ 358364 │
+│ milk       │ 346769 │
+│ water      │ 326092 │
+│ vanilla    │ 270381 │
+└────────────┴────────┘
+```
+
+Самые сложные рецепты с яйцами
+
+```sql
+SELECT
+    title,
+    length(NER),
+    length(directions)
+FROM test2.recipes
+WHERE has(NER, 'eggs')
+ORDER BY length(directions) DESC
+LIMIT 5;
+```
+
+```
+Query id: 91a15db0-0b93-447a-9e9f-8759bbb60413
+
+┌─title─────────────────────────────┬─length(NER)─┬─length(directions)─┐
+│ Soft Cheesy Pretzel               │           9 │                151 │
+│ Cannelloni with Asparagus and Ham │          13 │                148 │
+│ Making Egg Dough Pastas           │          18 │                145 │
+│ Gingerbread House                 │          15 │                133 │
+│ Birch De Noel Recipe              │          20 │                126 │
+└───────────────────────────────────┴─────────────┴────────────────────┘
+
+5 rows in set. Elapsed: 5.091 sec. Processed 2.23 million rows, 1.65 GB (438.21 thousand rows/s., 324.21 MB/s.)
+Peak memory usage: 29.06 MiB.
+```
+
+10 rows in set. Elapsed: 0.215 sec. Processed 2.23 million rows, 1.48 GB (10.35 million rows/s., 6.86 GB/s.)
+
+В этом примере используется функция has для проверки вхождения элемента в массив, а также сортировка по количеству шагов (length(directions)).
+
+Существует свадебный торт, который требует целых 126 шагов для производства! Рассмотрим эти шаги:
+
+```sql
+SELECT arrayJoin(directions)
+FROM test2.recipes
+WHERE title = 'Chocolate-Strawberry-Orange Wedding Cake';
+```
+Результат этого запроса и полный лог в [Log](./out_03.log))

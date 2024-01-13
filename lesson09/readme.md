@@ -19,7 +19,7 @@
 
 Следуя инструкциям устанавливаем Clickhouse:
 
-'''bash
+```bash
 grep -q sse4_2 /proc/cpuinfo && echo "SSE 4.2 supported" || echo "SSE 4.2 not supported"
 
 sudo apt-get update
@@ -33,11 +33,11 @@ echo "deb https://packages.clickhouse.com/deb stable main" | sudo tee \
 sudo apt-get update
 
 sudo apt-get install -y clickhouse-server clickhouse-client
-'''
+```
 
 В конце установки можно посмотреть что было создано и где размещаются логи, данные и бинарники... (Полный лог установки: [Log](./out_01.log))
 
-'''bash
+```bash
 Creating clickhouse group if it does not exist.
  groupadd -r clickhouse
 Creating clickhouse user if it does not exist.
@@ -71,11 +71,11 @@ Start clickhouse-server with:
 
 Start clickhouse-client with:
  clickhouse-client --password
-'''
+```
 
 Запустим клиент и проверим все ли работает, выполнив зварос **SELECT 1**
 
-'''bash
+```bash
 service clickhouse-server start
 clickhouse-client
 ClickHouse client version 23.12.2.59 (official build).
@@ -104,7 +104,7 @@ ubuntu2204.localdomain :) exit
 Bye.
 root@ubuntu2204:~#
 
-'''
+```
 
 Как видим, все запустилось успешно.
 

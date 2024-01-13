@@ -1,4 +1,25 @@
+# Урок 9 - Clickhouse
 
+# Домашнее задание
+## Цель
+В результате выполнения ДЗ в разверните БД.
+
+## Описание/Пошаговая инструкция выполнения домашнего задания:
+Необходимо, используя туториал https://clickhouse.tech/docs/ru/getting-started/tutorial/ :
+
+- развернуть БД;
+- выполнить импорт тестовой БД;
+- выполнить несколько запросов и оценить скорость выполнения.
+- развернуть дополнительно одну из тестовых БД https://clickhouse.com/docs/en/getting-started/example-datasets , протестировать скорость запросов
+- развернуть Кликхаус в кластерном исполнении, создать распределенную таблицу, заполнить данными и протестировать скорость по сравнению с 1 инстансом
+
+### Устанавливаем сервер
+
+Первую часть задания будем выполнять на ВМ (VirtualBox) с установленной Ubuntu 22.04.3
+
+Следуя инструкциям устанавливаем Clickhouse:
+
+'''bash
 grep -q sse4_2 /proc/cpuinfo && echo "SSE 4.2 supported" || echo "SSE 4.2 not supported"
 
 sudo apt-get update
@@ -12,9 +33,11 @@ echo "deb https://packages.clickhouse.com/deb stable main" | sudo tee \
 sudo apt-get update
 
 sudo apt-get install -y clickhouse-server clickhouse-client
+'''
 
+В конце установки можно посмотреть что было создано и где размещаются логи, данные и бинарники... (Полный лог установки: [Log](./out_01.log))
 
-
+'''bash
 Creating clickhouse group if it does not exist.
  groupadd -r clickhouse
 Creating clickhouse user if it does not exist.
@@ -48,9 +71,11 @@ Start clickhouse-server with:
 
 Start clickhouse-client with:
  clickhouse-client --password
+'''
 
+Запустим клиент и проверим все ли работает, выполнив зварос **SELECT 1**
 
-
+'''bash
 service clickhouse-server start
 clickhouse-client
 ClickHouse client version 23.12.2.59 (official build).
@@ -78,3 +103,10 @@ Query id: 5ee5fd3d-fe78-49f5-a4a9-a92552e815a6
 ubuntu2204.localdomain :) exit
 Bye.
 root@ubuntu2204:~#
+
+'''
+
+Как видим, все запустилось успешно.
+
+### Импортируем тестовую БД
+

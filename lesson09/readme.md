@@ -100,6 +100,36 @@ Query id: 5ee5fd3d-fe78-49f5-a4a9-a92552e815a6
 
 1 row in set. Elapsed: 0.002 sec.
 
+ubuntu2204.localdomain :) create database test1 comment 'Database for testa OTUS'
+
+CREATE DATABASE test1
+COMMENT 'Database for testa OTUS'
+
+Query id: 2fdbefeb-8fef-4cd8-a388-7c5201a83ee7
+
+Ok.
+
+0 rows in set. Elapsed: 0.042 sec.
+
+ubuntu2204.localdomain :) SELECT name, comment FROM system.databases;
+
+SELECT
+    name,
+    comment
+FROM system.databases
+
+Query id: 51e29299-0cb0-41ba-bce0-e2504fe348ac
+
+┌─name───────────────┬─comment─────────────────┐
+│ INFORMATION_SCHEMA │                         │
+│ default            │                         │
+│ information_schema │                         │
+│ system             │                         │
+│ test1              │ Database for testa OTUS │
+└────────────────────┴─────────────────────────┘
+
+5 rows in set. Elapsed: 0.002 sec.
+
 ubuntu2204.localdomain :) exit
 Bye.
 root@ubuntu2204:~#

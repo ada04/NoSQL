@@ -17,7 +17,25 @@
 
 ## Описание/Пошаговая инструкция выполнения домашнего задания:
 
-### развернуть docker локально или в облаке
+### Разворачиваем docker локально
+
+```bash
+apt install docker.io
+```
+
+Проверяем...
+
+```bash
+docker run hello-world
+```
+
+```
+Hello from Docker!
+This message shows that your installation appears to be working correctly.
+```
+
+Docker успешно установлен
+
 
 ### поднять 3 узловый Cassandra кластер.
 

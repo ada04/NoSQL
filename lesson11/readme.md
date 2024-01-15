@@ -99,6 +99,14 @@ docker exec -it node1 nodetool status
 ```
 
 ```bash
+root@ubuntu2204:~# docker exec -it node1 nodetool status
+Datacenter: datacenter1
+=======================
+Status=Up/Down
+|/ State=Normal/Leaving/Joining/Moving
+--  Address     Load        Tokens  Owns (effective)  Host ID                               Rack
+UN  172.17.0.4  131.35 KiB  16      100.0%            3c5463a7-d366-4ebc-949c-a4100ffcae35  rack1
+UN  172.17.0.2  169.82 KiB  16      100.0%            09796465-fdcc-42f5-8eef-d5e20db963dc  rack1
 ```
 
     docker ps -a

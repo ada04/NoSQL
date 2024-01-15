@@ -40,8 +40,10 @@ Docker успешно установлен
 
 #### Скачиваем образ и запускаем первую ноду
     
-    docker pull cassandra
-    docker run --name node1 -d cassandra
+```bash
+docker pull cassandra
+docker run --name node1 -d cassandra
+```
 
 ```bash
 root@ubuntu2204:~# docker run --name node1 -d cassandra
@@ -57,9 +59,11 @@ CONTAINER ID   IMAGE       COMMAND                  CREATED         STATUS      
 - **nodetool status** информация о контейнере
 - **cqlsh** CQL shell
 
-    docker exec -it node1 bash
-    docker exec -it node1 nodetool status
-    docker exec -it node1 cqlsh
+```bash
+docker exec -it node1 bash
+docker exec -it node1 nodetool status
+docker exec -it node1 cqlsh
+```
 
 ```bash
 root@ubuntu2204:~# docker exec -it node1 bash
@@ -76,8 +80,10 @@ UN  172.17.0.2  104.33 KiB  16      100.0%            09796465-fdcc-42f5-8eef-d5
 
 #### Добавляем еще две ноды 
 
-    docker run --name node2 -d --link node1:cassandra cassandra
-    docker run --name node3 -d --link node1:cassandra cassandra
+```bash
+docker run --name node2 -d --link node1:cassandra cassandra
+docker run --name node3 -d --link node1:cassandra cassandra
+```
 
 ```bash
 root@ubuntu2204:~# docker run --name node2 -d --link node1:cassandra cassandra
@@ -88,7 +94,9 @@ root@ubuntu2204:~# docker run --name node3 -d --link node1:cassandra cassandra
 
 Посмотрим еще раз информацию о кластере и список запущенных контейнеров.
 
-    docker exec -it node1 nodetool status
+```bash
+docker exec -it node1 nodetool status
+```
 
 ```bash
 ```

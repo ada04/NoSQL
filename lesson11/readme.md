@@ -126,11 +126,12 @@ CONTAINER ID   IMAGE       COMMAND                  CREATED         STATUS      
 
 ### поднять 3 узловый Cassandra кластер. (Вариант 2) 
 
-** В этом варианте используем автоматизацию с docker-compose**
+**В этом варианте используем автоматизацию с docker-compose**
 
 Создадим файл конфигурации кластера:
 
 ```bash
+#apt install docker-compose
 mkdir compose
 cd compose
 vi docker-compose.yml
@@ -204,12 +205,27 @@ UN  172.18.0.3  70.27 KiB   16      58.2%             b841b9a1-d5f2-48ee-bc0d-d4
 UN  172.18.0.2  70.27 KiB   16      71.5%             0ba945de-0e6d-4cbe-92d7-bf3559922bed  rack1
 ```
 
+--docker network create app-tier --driver bridge
+
 ### Создать keyspase с 2-мя таблицами. Одна из таблиц должна иметь составной Partition key, как минимум одно поле - clustering key, как минимум одно поле не входящее в primiry key.
 
-```bash
+```sql
+CREATE KEYSPACE IF NOT EXISTS test1 WITH REPLICATION =
+{ 'class': 'SimpleStrategy',
+'replication_factor': '3'
+};
 ```
 
 ```bash
+root@ubuntu2204:~# docker exec -it compose_node11_1 cqlsh
+Connected to demo at 127.0.0.1:9042
+[cqlsh 6.1.0 | Cassandra 4.1.3 | CQL spec 3.4.6 | Native protocol v5]
+Use HELP for help.
+cqlsh> CREATE KEYSPACE IF NOT EXISTS test1 WITH REPLICATION =
+   ... { 'class': 'SimpleStrategy',
+   ... 'replication_factor': '3'
+   ... };
+cqlsh>
 ```
 
 ```bash

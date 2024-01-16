@@ -207,7 +207,7 @@ UN  172.18.0.2  70.27 KiB   16      71.5%             0ba945de-0e6d-4cbe-92d7-bf
 
 --docker network create app-tier --driver bridge
 
-### Создать keyspase с 2-мя таблицами. Одна из таблиц должна иметь составной Partition key, как минимум одно поле - clustering key, как минимум одно поле не входящее в primiry key.
+### Создать keyspaсe с 2-мя таблицами. Одна из таблиц должна иметь составной Partition key, как минимум одно поле - clustering key, как минимум одно поле не входящее в primiry key.
 
 Создаём пространство
 
@@ -321,12 +321,38 @@ Aggregation query used without partition key
 cqlsh>
 ```
 
-### Выполнить 2-3 варианта запроса использую WHERE
+### Выполнить 2-3 варианта запроса используя WHERE
 
 ```sql
+cqlsh> select items from sales.orders where customerid='COMMI';
+
+ items
+--------------------------------------
+ {30: 1, 35: 1, 46: 1, 48: 1, 147: 1}
+               {26: 1, 30: 1, 128: 1}
+
+(2 rows)
+cqlsh> select count(*) from sales.customers where Country = 'France';
+InvalidRequest: Error from server: code=2200 [Invalid query] message="Cannot execute this query as it might involve data filtering and thus may have unpredictable performance. If you want to execute this query despite the performance unpredictability, use ALLOW FILTERING"
 ```
 
 
-### Создать вторичный индекс на поле, не входящее в primiry key.
+### Создать вторичный индекс на поле, не входящее в primary key.
+
+```sql
+CREATE INDEX customers_country_idx ON sales.customers (country);
+
+cqlsh> select count(*) from sales.customers where Country = 'France';
+
+ count
+-------
+    11
+
+(1 rows)
+
+Warnings :
+Aggregation query used without partition key
+```
+
 
 ### (*) нагрузить кластер при помощи Cassandra Stress Tool (используя "How to use Apache Cassandra Stress Tool.pdf" из материалов).

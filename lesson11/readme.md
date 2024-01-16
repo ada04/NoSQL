@@ -36,7 +36,7 @@ This message shows that your installation appears to be working correctly.
 
 Docker успешно установлен
 
-### поднять 3 узловый Cassandra кластер.
+### поднять 3 узловый Cassandra кластер. (Вариант 1)
 
 #### Скачиваем образ и запускаем первую ноду
     
@@ -124,8 +124,102 @@ CONTAINER ID   IMAGE       COMMAND                  CREATED         STATUS      
     docker stop node1 node2 node3
     docker rm node1 node2 node3
 
+### поднять 3 узловый Cassandra кластер. (Вариант 2) 
+
+** В этом варианте используем автоматизацию с docker-compose**
+
+Создадим файл конфигурации кластера:
+
+```bash
+mkdir compose
+cd compose
+vi docker-compose.yml
+```
+
+Файл docker-compose.yml:
+
+```bash
+version: '2'
+services:
+
+  node11:
+    image: cassandra:latest
+    ports:
+      - "9042:9042"
+      - "9160:9160"
+    environment:
+      CASSANDRA_CLUSTER_NAME: demo
+      CASSANDRA_SEEDS: node11,node12,node13
+    restart: unless-stopped
+
+  node12:
+    image: cassandra:latest
+    environment:
+      CASSANDRA_CLUSTER_NAME: demo
+      CASSANDRA_SEEDS: node11,node12,node13
+    restart: unless-stopped
+
+  node13:
+    image: cassandra:latest
+    environment:
+      CASSANDRA_CLUSTER_NAME: demo
+      CASSANDRA_SEEDS: node11,node12,node13
+    restart: unless-stopped
+```
+
+Запускаем кластер
+
+```bash
+docker-compose up -d
+```
+
+```bash
+root@ubuntu2204:~/compose# docker-compose up -d
+Creating network "compose_default" with the default driver
+Creating compose_node13_1 ... done
+Creating compose_node11_1 ... done
+Creating compose_node12_1 ... done
+root@ubuntu2204:~/compose# docker ps
+CONTAINER ID   IMAGE              COMMAND                  CREATED          STATUS          PORTS                                                                                                                      NAMES
+a32e45a2c3a0   cassandra:latest   "docker-entrypoint.s…"   19 seconds ago   Up 12 seconds   7000-7001/tcp, 7199/tcp, 9042/tcp, 9160/tcp                                                                                compose_node13_1
+18c48f67eff3   cassandra:latest   "docker-entrypoint.s…"   19 seconds ago   Up 12 seconds   7000-7001/tcp, 0.0.0.0:9042->9042/tcp, 7199/tcp, 0.0.0.0:9                                                 160->9160/tcp   compose_node11_1
+d09ef7caf931   cassandra:latest   "docker-entrypoint.s…"   19 seconds ago   Up 12 seconds   7000-7001/tcp, 7199/tcp, 9042/tcp, 9160/tcp                                                                                compose_node12_1
+```
+
+Смотрим статус:
+
+```bash
+docker exec -it compose_node11_1 nodetool status
+```
+
+```bash
+root@ubuntu2204:~/compose# docker exec -it compose_node11_1 nodetool status
+Datacenter: datacenter1
+=======================
+Status=Up/Down
+|/ State=Normal/Leaving/Joining/Moving
+--  Address     Load        Tokens  Owns (effective)  Host ID                               Rack
+UN  172.18.0.4  242.39 KiB  16      70.4%             4a5ae988-ac02-4db5-abd3-a9e5e5aa9def  rack1
+UN  172.18.0.3  70.27 KiB   16      58.2%             b841b9a1-d5f2-48ee-bc0d-d4f1c948876b  rack1
+UN  172.18.0.2  70.27 KiB   16      71.5%             0ba945de-0e6d-4cbe-92d7-bf3559922bed  rack1
+```
 
 ### Создать keyspase с 2-мя таблицами. Одна из таблиц должна иметь составной Partition key, как минимум одно поле - clustering key, как минимум одно поле не входящее в primiry key.
+
+```bash
+```
+
+```bash
+```
+
+```bash
+```
+
+```bash
+```
+
+```bash
+```
 
 ### Заполнить данными обе таблицы.
 

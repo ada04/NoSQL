@@ -246,7 +246,8 @@ create table sales.customers (
 );
 
 CREATE TABLE SALES.ORDERS (
-  customerid int,
+  order_id int,
+  customerid text,
   ordertime timestamp,
   items map<int,int>,
   PRIMARY KEY (customerid, ordertime)
@@ -257,44 +258,74 @@ CREATE TABLE SALES.ORDERS (
 
 Заполняем данными (однй из csv файла, вторую при помощи INSERT)
 
-```bash
+```sql
 COPY sales.customers (CustomerID, CompanyName, ContactName, ContactTitle, Address, City, Region, PostalCode, Country, Phone, Fax) FROM '/data/files/customers.csv' WITH HEADER = TRUE;
 
-INSERT INTO sales.orders (customerid, ordertime, items) VALUES (101000,'2023-06-30 12:06:00',{27:1,48:1,116:1});
-INSERT INTO sales.orders (customerid, ordertime, items) VALUES (100967,'2023-05-31 12:05:00',{147:1});
-INSERT INTO sales.orders (customerid, ordertime, items) VALUES (100968,'2023-05-31 12:05:00',{147:1});
-INSERT INTO sales.orders (customerid, ordertime, items) VALUES (100969,'2023-05-31 12:05:00',{21:1,26:1,30:1,116:1});
-INSERT INTO sales.orders (customerid, ordertime, items) VALUES (100970,'2023-05-31 12:05:00',{21:1,26:1,30:1,40:1,46:1,128:1,147:1});
-INSERT INTO sales.orders (customerid, ordertime, items) VALUES (100971,'2023-05-31 12:05:00',{26:1,35:1,46:1,116:1});
-INSERT INTO sales.orders (customerid, ordertime, items) VALUES (100972,'2023-05-31 12:05:00',{35:1});
-INSERT INTO sales.orders (customerid, ordertime, items) VALUES (100973,'2023-05-31 12:05:00',{46:1});
-INSERT INTO sales.orders (customerid, ordertime, items) VALUES (100974,'2023-05-31 12:05:00',{30:1,35:1,46:1,48:1,147:1});
-INSERT INTO sales.orders (customerid, ordertime, items) VALUES (100975,'2023-05-31 12:05:00',{21:1,26:1,128:1});
-INSERT INTO sales.orders (customerid, ordertime, items) VALUES (100976,'2023-06-30 12:06:00',{15:1,26:1,35:1,116:1});
-INSERT INTO sales.orders (customerid, ordertime, items) VALUES (100977,'2023-06-30 12:06:00',{21:1,30:1,35:1,40:1,48:1});
-INSERT INTO sales.orders (customerid, ordertime, items) VALUES (100978,'2023-06-30 12:06:00',{18:1,35:1,147:1});
-INSERT INTO sales.orders (customerid, ordertime, items) VALUES (100979,'2023-06-30 12:06:00',{147:1});
-INSERT INTO sales.orders (customerid, ordertime, items) VALUES (100980,'2023-06-30 12:06:00',{26:1,48:1});
-INSERT INTO sales.orders (customerid, ordertime, items) VALUES (100981,'2023-06-30 12:06:00',{30:1,46:1,147:1});
-INSERT INTO sales.orders (customerid, ordertime, items) VALUES (100982,'2023-06-30 12:06:00',{21:1,26:1,46:1,48:1,128:1});
-INSERT INTO sales.orders (customerid, ordertime, items) VALUES (100984,'2023-06-30 12:06:00',{30:1,46:1,147:1});
-INSERT INTO sales.orders (customerid, ordertime, items) VALUES (100985,'2023-06-30 12:06:00',{21:1,26:1,48:1});
-INSERT INTO sales.orders (customerid, ordertime, items) VALUES (100986,'2023-06-30 12:06:00',{21:1,26:1});
-INSERT INTO sales.orders (customerid, ordertime, items) VALUES (100988,'2023-06-30 12:06:00',{21:1,30:1,35:1,116:1});
-INSERT INTO sales.orders (customerid, ordertime, items) VALUES (100989,'2023-06-30 12:06:00',{21:1,26:1,35:1,46:1,48:1,116:1,147:1});
-INSERT INTO sales.orders (customerid, ordertime, items) VALUES (100990,'2023-06-30 12:06:00',{26:1,30:1,46:1,147:1});
-INSERT INTO sales.orders (customerid, ordertime, items) VALUES (100991,'2023-06-30 12:06:00',{26:1,46:1});
-INSERT INTO sales.orders (customerid, ordertime, items) VALUES (100992,'2023-06-30 12:06:00',{21:1,30:1,46:1,147:1});
-INSERT INTO sales.orders (customerid, ordertime, items) VALUES (100993,'2023-06-30 12:06:00',{26:1,27:1,40:1});
-INSERT INTO sales.orders (customerid, ordertime, items) VALUES (100994,'2023-06-30 12:06:00',{26:1,30:1,128:1});
-INSERT INTO sales.orders (customerid, ordertime, items) VALUES (100995,'2023-06-30 12:06:00',{21:1,30:1,46:1,116:1,147:1});
-INSERT INTO sales.orders (customerid, ordertime, items) VALUES (100996,'2023-06-30 12:06:00',{30:1});
-INSERT INTO sales.orders (customerid, ordertime, items) VALUES (100997,'2023-06-30 12:06:00',{21:1,30:1});
-INSERT INTO sales.orders (customerid, ordertime, items) VALUES (100998,'2023-06-30 12:06:00',{40:1});
-INSERT INTO sales.orders (customerid, ordertime, items) VALUES (100999,'2023-06-30 12:06:00',{26:1,35:1,116:1});
+INSERT INTO sales.orders (order_id, customerid, ordertime, items) VALUES (101000,'CENTC','2023-06-01 12:06:00',{27:1,48:1,116:1});
+INSERT INTO sales.orders (order_id, customerid, ordertime, items) VALUES (100967,'TORTU','2023-05-31 31.05.2000  12:05:00',{147:1});
+INSERT INTO sales.orders (order_id, customerid, ordertime, items) VALUES (100968,'PERIC','2023-05-31 12:05:00',{147:1});
+INSERT INTO sales.orders (order_id, customerid, ordertime, items) VALUES (100969,'ERNSH','2023-05-31 12:05:00',{21:1,26:1,30:1,116:1});
+INSERT INTO sales.orders (order_id, customerid, ordertime, items) VALUES (100970,'FRANS','2023-05-31 12:05:00',{21:1,26:1,30:1,40:1,46:1,128:1,147:1});
+INSERT INTO sales.orders (order_id, customerid, ordertime, items) VALUES (100971,'REGGC','2023-05-31 12:05:00',{26:1,35:1,46:1,116:1});
+INSERT INTO sales.orders (order_id, customerid, ordertime, items) VALUES (100972,'QUEDE','2023-05-31 12:05:00',{35:1});
+INSERT INTO sales.orders (order_id, customerid, ordertime, items) VALUES (100973,'MEREP','2023-05-31 12:05:00',{46:1});
+INSERT INTO sales.orders (order_id, customerid, ordertime, items) VALUES (100974,'COMMI','2023-05-31 12:05:00',{30:1,35:1,46:1,48:1,147:1});
+INSERT INTO sales.orders (order_id, customerid, ordertime, items) VALUES (100975,'CENTC','2023-05-31 12:05:00',{21:1,26:1,128:1});
+INSERT INTO sales.orders (order_id, customerid, ordertime, items) VALUES (100976,'TORTU','2023-06-01 12:06:00',{15:1,26:1,35:1,116:1});
+INSERT INTO sales.orders (order_id, customerid, ordertime, items) VALUES (100977,'PERIC','2023-06-01 12:06:00',{21:1,30:1,35:1,40:1,48:1});
+INSERT INTO sales.orders (order_id, customerid, ordertime, items) VALUES (100978,'ERNSH','2023-06-01 12:06:00',{18:1,35:1,147:1});
+INSERT INTO sales.orders (order_id, customerid, ordertime, items) VALUES (100979,'FRANS','2023-06-01 12:06:00',{147:1});
+INSERT INTO sales.orders (order_id, customerid, ordertime, items) VALUES (100980,'REGGC','2023-06-01 12:06:00',{26:1,48:1});
+INSERT INTO sales.orders (order_id, customerid, ordertime, items) VALUES (100981,'QUEDE','2023-06-01 12:06:00',{30:1,46:1,147:1});
+INSERT INTO sales.orders (order_id, customerid, ordertime, items) VALUES (100982,'MEREP','2023-06-01 12:06:00',{21:1,26:1,46:1,48:1,128:1});
+INSERT INTO sales.orders (order_id, customerid, ordertime, items) VALUES (100984,'COMMI','2023-06-01 12:06:00',{30:1,46:1,147:1});
+INSERT INTO sales.orders (order_id, customerid, ordertime, items) VALUES (100985,'CENTC','2023-06-01 12:06:00',{21:1,26:1,48:1});
+INSERT INTO sales.orders (order_id, customerid, ordertime, items) VALUES (100986,'TORTU','2023-06-01 12:06:00',{21:1,26:1});
+INSERT INTO sales.orders (order_id, customerid, ordertime, items) VALUES (100988,'PERIC','2023-06-01 12:06:00',{21:1,30:1,35:1,116:1});
+INSERT INTO sales.orders (order_id, customerid, ordertime, items) VALUES (100989,'ERNSH','2023-06-01 12:06:00',{21:1,26:1,35:1,46:1,48:1,116:1,147:1});
+INSERT INTO sales.orders (order_id, customerid, ordertime, items) VALUES (100990,'FRANS','2023-06-01 12:06:00',{26:1,30:1,46:1,147:1});
+INSERT INTO sales.orders (order_id, customerid, ordertime, items) VALUES (100991,'REGGC','2023-06-01 12:06:00',{26:1,46:1});
+INSERT INTO sales.orders (order_id, customerid, ordertime, items) VALUES (100992,'QUEDE','2023-06-01 12:06:00',{21:1,30:1,46:1,147:1});
+INSERT INTO sales.orders (order_id, customerid, ordertime, items) VALUES (100993,'MEREP','2023-06-01 12:06:00',{26:1,27:1,40:1});
+INSERT INTO sales.orders (order_id, customerid, ordertime, items) VALUES (100994,'COMMI','2023-06-01 12:06:00',{26:1,30:1,128:1});
+INSERT INTO sales.orders (order_id, customerid, ordertime, items) VALUES (100995,'CENTC','2023-06-01 12:06:00',{21:1,30:1,46:1,116:1,147:1});
+INSERT INTO sales.orders (order_id, customerid, ordertime, items) VALUES (100996,'TORTU','2023-06-01 12:06:00',{30:1});
+INSERT INTO sales.orders (order_id, customerid, ordertime, items) VALUES (100997,'PERIC','2023-06-01 12:06:00',{21:1,30:1});
+INSERT INTO sales.orders (order_id, customerid, ordertime, items) VALUES (100998,'ERNSH','2023-06-01 12:06:00',{40:1});
+INSERT INTO sales.orders (order_id, customerid, ordertime, items) VALUES (100999,'FRANS','2023-06-01 12:06:00',{26:1,35:1,116:1});
+```
+
+```sql
+cqlsh> select count(*) from sales.customers;
+
+ count
+-------
+    91
+
+(1 rows)
+
+Warnings :
+Aggregation query used without partition key
+
+cqlsh> select count(*) from sales.orders;
+
+ count
+-------
+    17
+
+(1 rows)
+
+Warnings :
+Aggregation query used without partition key
+
+cqlsh>
 ```
 
 ### Выполнить 2-3 варианта запроса использую WHERE
+
+```sql
+```
+
 
 ### Создать вторичный индекс на поле, не входящее в primiry key.
 

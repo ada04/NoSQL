@@ -356,3 +356,6 @@ Aggregation query used without partition key
 
 
 ### (*) нагрузить кластер при помощи Cassandra Stress Tool (используя "How to use Apache Cassandra Stress Tool.pdf" из материалов).
+
+Ни в одном из двух уроков нет данного документа.
+Да и ссылки в уроке ведут на сайт, заблокированный РКН (canva)...

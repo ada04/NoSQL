@@ -231,8 +231,8 @@ cqlsh>
 Создаем две таблицы
 
 ```bash
-create table sales.customers (
-       CustomerID varchar PRIMARY KEY,
+CREATE TABLE sales.customers (
+       CustomerID varchar,
        CompanyName varchar,
        ContactName varchar,
        ContactTitle varchar,
@@ -242,10 +242,11 @@ create table sales.customers (
        PostalCode varchar,
        Country varchar,
        Phone varchar,
-       Fax varchar
+       Fax varchar,
+       PRIMARY KEY (CustomerID)
 );
 
-CREATE TABLE SALES.ORDERS (
+CREATE TABLE sales.orders (
   order_id int,
   customerid text,
   ordertime timestamp,
@@ -296,7 +297,7 @@ INSERT INTO sales.orders (order_id, customerid, ordertime, items) VALUES (100999
 ```
 
 ```sql
-cqlsh> select count(*) from sales.customers;
+cqlsh> SELECT count(*) FROM sales.customers;
 
  count
 -------
@@ -307,7 +308,7 @@ cqlsh> select count(*) from sales.customers;
 Warnings :
 Aggregation query used without partition key
 
-cqlsh> select count(*) from sales.orders;
+cqlsh> SELECT count(*) FROM sales.orders;
 
  count
 -------
@@ -324,7 +325,7 @@ cqlsh>
 ### Выполнить 2-3 варианта запроса используя WHERE
 
 ```sql
-cqlsh> select items from sales.orders where customerid='COMMI';
+cqlsh> SELECT items FROM sales.orders WHERE customerid='COMMI';
 
  items
 --------------------------------------
@@ -342,7 +343,7 @@ InvalidRequest: Error from server: code=2200 [Invalid query] message="Cannot exe
 ```sql
 CREATE INDEX customers_country_idx ON sales.customers (country);
 
-cqlsh> select count(*) from sales.customers where Country = 'France';
+cqlsh> SELECT count(*) FROM sales.customers WHERE Country = 'France';
 
  count
 -------

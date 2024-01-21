@@ -374,5 +374,164 @@ nodetool listsnapshots
 
 #### Поиск снепшотов
 
-```sql
+```bash
+find -name snapshots
 ```
+
+Результат:
+
+```bash
+./var/lib/cassandra/data/cqlkeyspace/t2-ea230eb0b84e11ee85a6ddcd8bd8c5a1/snapshots
+./var/lib/cassandra/data/cqlkeyspace/t-e797cff0b84e11ee85a6ddcd8bd8c5a1/snapshots
+./var/lib/cassandra/data/catalogkeyspace/journal-14c906b0b84f11ee85a6ddcd8bd8c5a1/snapshots
+./var/lib/cassandra/data/catalogkeyspace/magazine-196a0610b84f11ee85a6ddcd8bd8c5a1/snapshots
+```
+
+В списке ищем нужную нам таблицу, например **journal** из keyspace **catalogkeyspace** 
+
+```bash
+ cd /var/lib/cassandra/data/catalogkeyspace/journal-14c906b0b84f11ee85a6ddcd8bd8c5a1/snapshots && ls -l
+```
+
+Получаем список наших снимков, которые мы выполняли.
+Результат:
+
+```bash
+root@3ab8c4be0861:/# cd /var/lib/cassandra/data/catalogkeyspace/journal-14c906b0b84f11ee85a6ddcd8bd8c5a1/snapshots && ls -l
+total 16
+drwxr-xr-x 2 cassandra cassandra 4096 Jan 21 11:33 1705836798898
+drwxr-xr-x 2 cassandra cassandra 4096 Jan 21 12:18 catalog-cql-ks
+drwxr-xr-x 2 cassandra cassandra 4096 Jan 21 11:59 catalog-ks
+drwxr-xr-x 2 cassandra cassandra 4096 Jan 21 12:13 catalog-ks1
+```
+
+Переходим в один из каталогов
+
+```bash
+cd catalog-ks && ls -l
+```
+
+Получим список файлов среди которых есть CQL скрипт для восстановления таблицы
+Результат:
+
+```bash
+root@3ab8c4be0861:/var/lib/cassandra/data/catalogkeyspace/journal-14c906b0b84f11ee85a6ddcd8bd8c5a1/snapshots# cd catalog-ks && ls -l
+total 44
+-rw-r--r-- 1 cassandra cassandra   88 Jan 21 11:59 manifest.json
+-rw-r--r-- 5 cassandra cassandra   47 Jan 21 11:33 nb-1-big-CompressionInfo.db
+-rw-r--r-- 5 cassandra cassandra   99 Jan 21 11:33 nb-1-big-Data.db
+-rw-r--r-- 5 cassandra cassandra   10 Jan 21 11:33 nb-1-big-Digest.crc32
+-rw-r--r-- 5 cassandra cassandra   16 Jan 21 11:33 nb-1-big-Filter.db
+-rw-r--r-- 5 cassandra cassandra   16 Jan 21 11:33 nb-1-big-Index.db
+-rw-r--r-- 5 cassandra cassandra 4768 Jan 21 11:33 nb-1-big-Statistics.db
+-rw-r--r-- 5 cassandra cassandra   56 Jan 21 11:33 nb-1-big-Summary.db
+-rw-r--r-- 5 cassandra cassandra   92 Jan 21 11:33 nb-1-big-TOC.txt
+-rw-r--r-- 1 cassandra cassandra  922 Jan 21 11:59 schema.cql
+```
+
+#### Очистка снепшотов
+
+Удаление снепшотов одной таблицы из keyspace
+
+```bash
+nodetool clearsnapshot -t magazine cqlkeyspace
+```
+
+удаление всех снепшотов keyspace
+
+```bash
+nodetool clearsnapshot -all cqlkeyspace
+```
+
+### Incremental Backups
+
+#### Настройка для инкрементального бекапа
+
+Для создания инкрементального бекапа необходимо включить параметр **incremental_backups** в **cassandra.yaml**
+
+```bash
+incremental_backups: true
+```
+
+#### Создание инкрементального бекапа
+
+После создания таблиц выполним очистку командой **nodetool flush**. В результате будет создан инкрементальный бекап.
+
+```bash
+nodetool flush cqlkeyspace t
+nodetool flush cqlkeyspace t2
+nodetool flush catalogkeyspace journal magazine
+```
+
+Список резервных копий:
+
+```bash
+find -name backups
+```
+
+### Восстановление из инкрементального бекапа и снепшотов
+
+**Восстановление производится при помощи двух утилит:**
+- sstableloader
+- nodetool import
+
+Необходимо обратить внимание:
+- Cнепшот содержит, по сути, тот же набор файлов, что и инкрементная резервная копия с несколькими дополнительными файлами. 
+- Снепшот включает файл schema.cql для DDL схемы для создания таблицы в CQL. 
+- Резервная копия таблицы не содержит DDL, который необходимо получить из моментального снимка при восстановлении из инкрементной резервной копии.
+
+Удалим таблицу **cqlkeyspace.t**
+
+```sql
+cqlsh> SELECT * FROM cqlkeyspace.t;
+
+ id | k | v
+----+---+------
+  1 | 1 | val1
+  0 | 0 | val0
+
+(2 rows)
+cqlsh> DROP cqlkeyspace.t;
+SyntaxException: line 1:5 no viable alternative at input 'cqlkeyspace' ([DROP] cqlkeyspace...)
+cqlsh> DELETE cqlkeyspace.t;
+SyntaxException: line 1:20 mismatched input ';' expecting K_FROM (DELETE cqlkeyspace.t[;])
+cqlsh> DROP TABLE cqlkeyspace.t;
+cqlsh> SELECT * FROM cqlkeyspace.t;
+InvalidRequest: Error from server: code=2200 [Invalid query] message="table t does not exist"
+cqlsh>
+```
+
+Для восстановления ищем нужный каталог в снепшотах, восстанавливаем таблицу и данные
+
+```bash
+find -name snapshots
+cd /var/lib/cassandra/data/cqlkeyspace/t-e797cff0b84e11ee85a6ddcd8bd8c5a1/snapshots && ls -l
+cd multi-table && ls -l
+cqlsh -f schema.cql
+```
+
+
+```bash
+root@3ab8c4be0861:/var/lib/cassandra/data/cqlkeyspace/t-e797cff0b84e11ee85a6ddcd8bd8c5a1/snapshots/multi-table# cqlsh -f schema.cql
+root@3ab8c4be0861:/var/lib/cassandra/data/cqlkeyspace/t-e797cff0b84e11ee85a6ddcd8bd8c5a1/snapshots/multi-table# cqlsh
+Connected to demo at 127.0.0.1:9042
+[cqlsh 6.1.0 | Cassandra 4.1.3 | CQL spec 3.4.6 | Native protocol v5]
+Use HELP for help.
+cqlsh> SELECT * FROM cqlkeyspace.t;
+
+ id | k | v
+----+---+---
+
+(0 rows)
+cqlsh>
+
+```
+
+```bash
+
+```
+
+```bash
+
+```
+

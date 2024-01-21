@@ -336,13 +336,21 @@ find -name snapshots
 ./var/lib/cassandra/data/system_traces/events-8826e8e9e16a372887533bc1fc713c25/snapshots
 ```
 
+Создадим снимок **catalog-ks** для всех таблиц keyspace **catalogkeyspace**
+
 ```bash
+nodetool snapshot --tag catalog-ks catalogkeyspace
 ```
 
 ```bash
 root@3ab8c4be0861:/# nodetool snapshot --tag catalog-ks catalogkeyspace
 Requested creating snapshot(s) for [catalogkeyspace] with snapshot name [catalog-ks] and options {skipFlush=false}
 Snapshot directory: catalog-ks
+```
+
+
+
+```bash
 ```
 
 

@@ -1,0 +1,78 @@
+root@ubuntu2204:~/compose# docker exec -it compose_node1_1 cqlsh
+Connected to demo at 127.0.0.1:9042
+[cqlsh 6.1.0 | Cassandra 4.1.3 | CQL spec 3.4.6 | Native protocol v5]
+Use HELP for help.
+cqlsh> CREATE KEYSPACE cqlkeyspace
+   ...    WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 3};
+cqlsh> USE cqlkeyspace;
+cqlsh:cqlkeyspace> CREATE TABLE t (
+               ...    id int,
+               ...    k int,
+               ...    v text,
+               ...    PRIMARY KEY (id)
+               ... );
+cqlsh:cqlkeyspace> CREATE TABLE t2 (
+               ...    id int,
+               ...    k int,
+               ...    v text,
+               ...    PRIMARY KEY (id)
+               ... );
+cqlsh:cqlkeyspace> INSERT INTO t (id, k, v) VALUES (0, 0, 'val0');
+cqlsh:cqlkeyspace> INSERT INTO t (id, k, v) VALUES (1, 1, 'val1');
+cqlsh:cqlkeyspace>
+cqlsh:cqlkeyspace> INSERT INTO t2 (id, k, v) VALUES (0, 0, 'val0');
+cqlsh:cqlkeyspace> INSERT INTO t2 (id, k, v) VALUES (1, 1, 'val1');
+cqlsh:cqlkeyspace> INSERT INTO t2 (id, k, v) VALUES (2, 2, 'val2');
+cqlsh:cqlkeyspace> SELECT * FROM t;
+
+ id | k | v
+----+---+------
+  1 | 1 | val1
+  0 | 0 | val0
+
+(2 rows)
+cqlsh:cqlkeyspace> SELECT * FROM t2;
+
+ id | k | v
+----+---+------
+  1 | 1 | val1
+  0 | 0 | val0
+  2 | 2 | val2
+
+(3 rows)
+cqlsh:cqlkeyspace> CREATE KEYSPACE catalogkeyspace
+               ...    WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 3};
+cqlsh:cqlkeyspace> USE catalogkeyspace;
+cqlsh:catalogkeyspace> CREATE TABLE journal (
+                   ...    id int,
+                   ...    name text,
+                   ...    publisher text,
+                   ...    PRIMARY KEY (id)
+                   ... );
+cqlsh:catalogkeyspace> CREATE TABLE magazine (
+                   ...    id int,
+                   ...    name text,
+                   ...    publisher text,
+                   ...    PRIMARY KEY (id)
+                   ... );
+cqlsh:catalogkeyspace> INSERT INTO journal (id, name, publisher) VALUES (0, 'Apache Cassandra Magazine', 'Apache Cassandra');
+cqlsh:catalogkeyspace> INSERT INTO journal (id, name, publisher) VALUES (1, 'Couchbase Magazine', 'Couchbase');
+cqlsh:catalogkeyspace> INSERT INTO magazine (id, name, publisher) VALUES (0, 'Apache Cassandra Magazine', 'Apache Cassandra');
+cqlsh:catalogkeyspace> INSERT INTO magazine (id, name, publisher) VALUES (1, 'Couchbase Magazine', 'Couchbase');
+cqlsh:catalogkeyspace> SELECT * FROM catalogkeyspace.journal;
+
+ id | name                      | publisher
+----+---------------------------+------------------
+  1 |        Couchbase Magazine |        Couchbase
+  0 | Apache Cassandra Magazine | Apache Cassandra
+
+(2 rows)
+cqlsh:catalogkeyspace> SELECT * FROM catalogkeyspace.magazine;
+
+ id | name                      | publisher
+----+---------------------------+------------------
+  1 |        Couchbase Magazine |        Couchbase
+  0 | Apache Cassandra Magazine | Apache Cassandra
+
+(2 rows)
+cqlsh:catalogkeyspace>

@@ -233,7 +233,7 @@ cqlsh:catalogkeyspace> SELECT * FROM catalogkeyspace.magazine;
 (2 rows)
 ```
 
-Ссылка на лог 01
+Ссылка на лог [Log](./log01.txt))
 
 ### Snapshots
 

@@ -508,8 +508,11 @@ find -name snapshots
 cd /var/lib/cassandra/data/cqlkeyspace/t-e797cff0b84e11ee85a6ddcd8bd8c5a1/snapshots && ls -l
 cd multi-table && ls -l
 cqlsh -f schema.cql
+nodetool import cqlkeyspace t /var/lib/cassandra/data/cqlkeyspace/t-e797cff0b84e11ee85a6ddcd8bd8c5a1/snapshots/multi-table
+select * from cqlkeyspace.t;
 ```
 
+Результат:
 
 ```bash
 root@3ab8c4be0861:/var/lib/cassandra/data/cqlkeyspace/t-e797cff0b84e11ee85a6ddcd8bd8c5a1/snapshots/multi-table# cqlsh -f schema.cql
@@ -523,15 +526,91 @@ cqlsh> SELECT * FROM cqlkeyspace.t;
 ----+---+---
 
 (0 rows)
+cqlsh> exit
+
+root@3ab8c4be0861:/# nodetool import cqlkeyspace t /var/lib/cassandra/data/cqlkeyspace/t-e797cff0b84e11ee85a6ddcd8bd8c5a1/snapshots/multi-table
+root@3ab8c4be0861:/# cqlsh
+Connected to demo at 127.0.0.1:9042
+[cqlsh 6.1.0 | Cassandra 4.1.3 | CQL spec 3.4.6 | Native protocol v5]
+Use HELP for help.
+cqlsh> select * from cqlkeyspace.t;
+
+ id | k | v
+----+---+------
+  1 | 1 | val1
+  0 | 0 | val0
+
+(2 rows)
 cqlsh>
+```
 
+#### Использование sstableloader
+
+Для начала необходимо скопировать файлы снепшота в каталог: .../<keyspace>/<table> , затем запустить утилиту:
+
+```bash
+mkdir -p /tmp/cqlkeyspace/t
+cp /var/lib/cassandra/data/cqlkeyspace/t-e797cff0b84e11ee85a6ddcd8bd8c5a1/snapshots/truncated-1705849278370-t/* /tmp/cqlkeyspace/t/
+sstableloader --nodes 172.23.0.4 /tmp/cqlkeyspace/t/
 ```
 
 ```bash
+root@3ab8c4be0861:/# mkdir -p /tmp/cqlkeyspace/t
+root@3ab8c4be0861:/# cp /var/lib/cassandra/data/cqlkeyspace/t-e797cff0b84e11ee85a6ddcd8bd8c5a1/snapshots/truncated-1705849278370-t/* /tmp/cqlkeyspace/t/
+root@3ab8c4be0861:/# sstableloader --nodes 172.23.0.4 /tmp/cqlkeyspace/t/
+WARN  15:26:50,573 Only 51.965GiB free across all data volumes. Consider adding more capacity to your cluster or removing obsolete snapshots
+Established connection to initial hosts
+Opening sstables and calculating sections to stream
+Streaming relevant part of /tmp/cqlkeyspace/t/nb-1-big-Data.db  to [/172.23.0.4:7000, /172.23.0.3:7000, /172.23.0.2:7000]
+progress: [/172.23.0.4:7000]0:0/7 0  % [/172.23.0.3:7000]0:1/7 1  % [/172.23.0.2:7000]0:1/7 1  % total: 0% 0.030KiB/s (avg: 0.030KiB/s)
+progress: [/172.23.0.4:7000]0:0/7 0  % [/172.23.0.3:7000]0:1/7 1  % [/172.23.0.2:7000]0:1/7 1  % total: 0% 0.000KiB/s (avg: 0.030KiB/s)
+progress: [/172.23.0.4:7000]0:0/7 0  % [/172.23.0.3:7000]0:2/7 1  % [/172.23.0.2:7000]0:2/7 1  % total: 1% 5.381KiB/s (avg: 0.038KiB/s)
+progress: [/172.23.0.4:7000]0:0/7 0  % [/172.23.0.3:7000]0:2/7 1  % [/172.23.0.2:7000]0:2/7 1  % total: 1% 0.000KiB/s (avg: 0.038KiB/s)
+progress: [/172.23.0.4:7000]0:0/7 0  % [/172.23.0.3:7000]0:2/7 1  % [/172.23.0.2:7000]0:3/7 97 % total: 32% 2.503MiB/s (avg: 1.202KiB/s)
+progress: [/172.23.0.4:7000]0:0/7 0  % [/172.23.0.3:7000]0:2/7 1  % [/172.23.0.2:7000]0:4/7 98 % total: 33% 5.341KiB/s (avg: 1.211KiB/s)
+progress: [/172.23.0.4:7000]0:0/7 0  % [/172.23.0.3:7000]0:2/7 1  % [/172.23.0.2:7000]0:5/7 98 % total: 33% 3.271KiB/s (avg: 1.214KiB/s)
+progress: [/172.23.0.4:7000]0:0/7 0  % [/172.23.0.3:7000]0:2/7 1  % [/172.23.0.2:7000]0:6/7 99 % total: 33% 2.979KiB/s (avg: 1.222KiB/s)
+progress: [/172.23.0.4:7000]0:0/7 0  % [/172.23.0.3:7000]0:2/7 1  % [/172.23.0.2:7000]0:7/7 100% total: 33% 0.854KiB/s (avg: 1.221KiB/s)
+progress: [/172.23.0.4:7000]0:0/7 0  % [/172.23.0.3:7000]0:3/7 97 % [/172.23.0.2:7000]0:7/7 100% total: 65% 757.845KiB/s (avg: 2.369KiB/s)
+progress: [/172.23.0.4:7000]0:0/7 0  % [/172.23.0.3:7000]0:4/7 98 % [/172.23.0.2:7000]0:7/7 100% total: 66% 3.087KiB/s (avg: 2.372KiB/s)
+progress: [/172.23.0.4:7000]0:0/7 0  % [/172.23.0.3:7000]0:5/7 98 % [/172.23.0.2:7000]0:7/7 100% total: 66% 0.346KiB/s (avg: 2.350KiB/s)
+progress: [/172.23.0.4:7000]0:0/7 0  % [/172.23.0.3:7000]0:6/7 99 % [/172.23.0.2:7000]0:7/7 100% total: 66% 2.287KiB/s (avg: 2.349KiB/s)
+progress: [/172.23.0.4:7000]0:0/7 0  % [/172.23.0.3:7000]0:7/7 100% [/172.23.0.2:7000]0:7/7 100% total: 66% 1.062KiB/s (avg: 2.346KiB/s)
+progress: [/172.23.0.4:7000]0:0/7 0  % [/172.23.0.3:7000]0:7/7 100% [/172.23.0.2:7000]0:7/7 100% total: 66% 0.000KiB/s (avg: 2.261KiB/s)
+progress: [/172.23.0.4:7000]0:0/7 0  % [/172.23.0.3:7000]0:7/7 100% [/172.23.0.2:7000]0:7/7 100% total: 66% 0.000KiB/s (avg: 2.256KiB/s)
+progress: [/172.23.0.4:7000]0:1/7 1  % [/172.23.0.3:7000]0:7/7 100% [/172.23.0.2:7000]0:7/7 100% total: 67% 3.822KiB/s (avg: 2.262KiB/s)
+progress: [/172.23.0.4:7000]0:2/7 1  % [/172.23.0.3:7000]0:7/7 100% [/172.23.0.2:7000]0:7/7 100% total: 67% 4.226KiB/s (avg: 2.264KiB/s)
+progress: [/172.23.0.4:7000]0:3/7 97 % [/172.23.0.3:7000]0:7/7 100% [/172.23.0.2:7000]0:7/7 100% total: 99% 770.407KiB/s (avg: 3.335KiB/s)
+progress: [/172.23.0.4:7000]0:4/7 98 % [/172.23.0.3:7000]0:7/7 100% [/172.23.0.2:7000]0:7/7 100% total: 99% 9.256KiB/s (avg: 3.342KiB/s)
+progress: [/172.23.0.4:7000]0:5/7 98 % [/172.23.0.3:7000]0:7/7 100% [/172.23.0.2:7000]0:7/7 100% total: 99% 1.377KiB/s (avg: 3.337KiB/s)
+progress: [/172.23.0.4:7000]0:6/7 99 % [/172.23.0.3:7000]0:7/7 100% [/172.23.0.2:7000]0:7/7 100% total: 99% 12.692KiB/s (avg: 3.346KiB/s)
+progress: [/172.23.0.4:7000]0:7/7 100% [/172.23.0.3:7000]0:7/7 100% [/172.23.0.2:7000]0:7/7 100% total: 100% 1.885KiB/s (avg: 3.344KiB/s)
+progress: [/172.23.0.4:7000]0:7/7 100% [/172.23.0.3:7000]0:7/7 100% [/172.23.0.2:7000]0:7/7 100% total: 100% 0.000KiB/s (avg: 3.251KiB/s)
 
+Summary statistics:
+   Connections per host    : 1
+   Total files transferred : 21
+   Total bytes transferred : 14.549KiB
+   Total duration          : 4723 ms
+   Average transfer rate   : 3.080KiB/s
+   Peak transfer rate      : 3.346KiB/s
+
+root@3ab8c4be0861:/# cqlsh
+Connected to demo at 127.0.0.1:9042
+[cqlsh 6.1.0 | Cassandra 4.1.3 | CQL spec 3.4.6 | Native protocol v5]
+Use HELP for help.
+cqlsh> SELECT * FROM cqlkeyspace.t;
+
+ id | k | v
+----+---+------
+  1 | 1 | val1
+  0 | 0 | val0
+
+(2 rows)
+cqlsh>
 ```
 
-```bash
+### Вывод
 
-```
-
+Штатные средства хороши для восстановления таблицы, но при большом количестве таблиц и операций я сомневаюсь в быстром нахождении нужного файла для восстановления.
+Восстановление болього количества таблиц потребует значительных затрат (необходимо создать таблицы, а потом импортировать данные).

@@ -348,11 +348,31 @@ Requested creating snapshot(s) for [catalogkeyspace] with snapshot name [catalog
 Snapshot directory: catalog-ks
 ```
 
-
+Создание снимка для всех таблиц нескольких keyspace **catalogkeyspace** и **cqlkeyspace** (список через пробел)
 
 ```bash
+nodetool snapshot --tag catalog-cql-ks catalogkeyspace cqlkeyspace
 ```
 
+Создание снимка для одной таблицы из keyspace
+
+```bash
+nodetool snapshot --tag magazine --table magazine  catalogkeyspace
+```
+
+Создание снимка для нескольких таблиц из разных keyspace (список через запятую без пробелов)
+
+```bash
+nodetool snapshot --kt-list cqlkeyspace.t,cqlkeyspace.t2 --tag multi-table
+```
+
+Посмотреть список снепшотов:
+
+```bash
+nodetool listsnapshots
+```
+
+#### Поиск снепшотов
 
 ```sql
 ```

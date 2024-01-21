@@ -235,14 +235,116 @@ cqlsh:catalogkeyspace> SELECT * FROM catalogkeyspace.magazine;
 
 Ссылка на лог 01
 
+### Snapshots
+
+Создадим снимки используя команду **nodetool snapshot**
+
+```bash
+docker exec -it compose_node1_1 nodetool snapshot
+```
+
+```bash
+root@ubuntu2204:~/compose# docker exec -it compose_node1_1 nodetool snapshot
+Requested creating snapshot(s) for [all keyspaces] with snapshot name [1705836798898] and options {skipFlush=false}
+Snapshot directory: 1705836798898
+```
+
+#### Настройка снепшотов:
+
+**отвлечение от темы - установим VIm в контейнер**
+
+```bash
+docker exec -it compose_node1_1 bash
+apt-get update
+apt-get install vim
+```
+
+Изменим параметры в **cassandra.yaml**
+
+```bash
+docker exec -it compose_node1_1 vi /etc/cassandra/cassandra.yaml
+```
+
+Выключим автоматическое создание снимков
+```bash
+auto_snapshot: false
+snapshot_before_compaction: false
+```
+
+#### Созадим снепшот
+
+Перед созданием снимка посмотрим какие снимки уже есть:
+
+**далее комнады выполняются внутри контейнера**
+
+```bash
+docker exec -it compose_node1_1 bash
+```
+
+```bash
+find -name snapshots
+```
+
+```bash
+./var/lib/cassandra/data/cqlkeyspace/t2-ea230eb0b84e11ee85a6ddcd8bd8c5a1/snapshots
+./var/lib/cassandra/data/cqlkeyspace/t-e797cff0b84e11ee85a6ddcd8bd8c5a1/snapshots
+./var/lib/cassandra/data/catalogkeyspace/journal-14c906b0b84f11ee85a6ddcd8bd8c5a1/snapshots
+./var/lib/cassandra/data/catalogkeyspace/magazine-196a0610b84f11ee85a6ddcd8bd8c5a1/snapshots
+./var/lib/cassandra/data/system_schema/indexes-0feb57ac311f382fba6d9024d305702f/snapshots
+./var/lib/cassandra/data/system_schema/functions-96489b7980be3e14a70166a0b9159450/snapshots
+./var/lib/cassandra/data/system_schema/types-5a8b1ca866023f77a0459273d308917a/snapshots
+./var/lib/cassandra/data/system_schema/views-9786ac1cdd583201a7cdad556410c985/snapshots
+./var/lib/cassandra/data/system_schema/aggregates-924c55872e3a345bb10c12f37c1ba895/snapshots
+./var/lib/cassandra/data/system_schema/keyspaces-abac5682dea631c5b535b3d6cffd0fb6/snapshots
+./var/lib/cassandra/data/system_schema/tables-afddfb9dbc1e30688056eed6c302ba09/snapshots
+./var/lib/cassandra/data/system_schema/columns-24101c25a2ae3af787c1b40ee1aca33f/snapshots
+./var/lib/cassandra/data/system_schema/dropped_columns-5e7583b5f3f43af19a39b7e1d6f5f11f/snapshots
+./var/lib/cassandra/data/system_schema/triggers-4df70b666b05325195a132b54005fd48/snapshots
+./var/lib/cassandra/data/system_auth/role_permissions-3afbe79f219431a7add7f5ab90d8ec9c/snapshots
+./var/lib/cassandra/data/system_auth/role_members-0ecdaa87f8fb3e6088d174fb36fe5c0d/snapshots
+./var/lib/cassandra/data/system_auth/network_permissions-d46780c22f1c3db9b4c1b8d9fbc0cc23/snapshots
+./var/lib/cassandra/data/system_auth/roles-5bc52802de2535edaeab188eecebb090/snapshots
+./var/lib/cassandra/data/system_auth/resource_role_permissons_index-5f2fbdad91f13946bd25d5da3a5c35ec/snapshots
+./var/lib/cassandra/data/system/available_ranges-c539fcabd65a31d18133d25605643ee3/snapshots
+./var/lib/cassandra/data/system/batches-919a4bc57a333573b03e13fc3f68b465/snapshots
+./var/lib/cassandra/data/system/peer_events_v2-0e65065fe40138ed9507b9213fae8d11/snapshots
+./var/lib/cassandra/data/system/built_views-4b3c50a9ea873d7691016dbc9c38494a/snapshots
+./var/lib/cassandra/data/system/sstable_activity_v2-62efe31f3be8310c8d298963439c1288/snapshots
+./var/lib/cassandra/data/system/IndexInfo-9f5c6374d48532299a0a5094af9ad1e3/snapshots
+./var/lib/cassandra/data/system/paxos-b7b7f0c2fd0a34108c053ef614bb7c2d/snapshots
+./var/lib/cassandra/data/system/sstable_activity-5a1ff267ace03f128563cfae6103c65e/snapshots
+./var/lib/cassandra/data/system/view_builds_in_progress-6c22df66c3bd3df6b74d21179c6a9fe9/snapshots
+./var/lib/cassandra/data/system/compaction_history-b4dbb7b4dc493fb5b3bfce6e434832ca/snapshots
+./var/lib/cassandra/data/system/peers_v2-c4325fbb8e5e3bafbd070f9250ed818e/snapshots
+./var/lib/cassandra/data/system/peer_events-59dfeaea8db2334191ef109974d81484/snapshots
+./var/lib/cassandra/data/system/transferred_ranges-6cad20f7d4f53af2b6e20da33c6c1f83/snapshots
+./var/lib/cassandra/data/system/transferred_ranges_v2-1ff78f1a7df13a2aa9986f4932270af5/snapshots
+./var/lib/cassandra/data/system/paxos_repair_history-ecb8666740b23316bb91e612c8047457/snapshots
+./var/lib/cassandra/data/system/table_estimates-176c39cdb93d33a5a2188eb06a56f66e/snapshots
+./var/lib/cassandra/data/system/local-7ad54392bcdd35a684174e047860b377/snapshots
+./var/lib/cassandra/data/system/available_ranges_v2-4224a0882ac93d0c889dfbb5f0facda0/snapshots
+./var/lib/cassandra/data/system/prepared_statements-18a9c2576a0c3841ba718cd529849fef/snapshots
+./var/lib/cassandra/data/system/top_partitions-7e5a361c317c351fb15fffd8afd3dd4b/snapshots
+./var/lib/cassandra/data/system/size_estimates-618f817b005f3678b8a453f3930b8e86/snapshots
+./var/lib/cassandra/data/system/repairs-a3d277d1cfaf36f5a2a738d5eea9ad6a/snapshots
+./var/lib/cassandra/data/system/peers-37f71aca7dc2383ba70672528af04d4f/snapshots
+./var/lib/cassandra/data/system_distributed/parent_repair_history-deabd734b99d3b9c92e5fd92eb5abf14/snapshots
+./var/lib/cassandra/data/system_distributed/repair_history-759fffad624b318180eefa9a52d1f627/snapshots
+./var/lib/cassandra/data/system_distributed/partition_denylist-d6123acc864934969d4ef3fe39a6018b/snapshots
+./var/lib/cassandra/data/system_distributed/view_build_status-5582b59f8e4e35e1b9133acada51eb04/snapshots
+./var/lib/cassandra/data/system_traces/sessions-c5e99f1686773914b17e960613512345/snapshots
+./var/lib/cassandra/data/system_traces/events-8826e8e9e16a372887533bc1fc713c25/snapshots
+```
+
+```bash
+```
+
+```bash
+root@3ab8c4be0861:/# nodetool snapshot --tag catalog-ks catalogkeyspace
+Requested creating snapshot(s) for [catalogkeyspace] with snapshot name [catalog-ks] and options {skipFlush=false}
+Snapshot directory: catalog-ks
+```
+
+
 ```sql
 ```
-```bash
-```
-
-
-### Воспользовавшись инструкцией https://cassandra.apache.org/doc/latest/cassandra/operating/backups.html создать бэкап и восстановиться из него.
-
-```bash
-```
-

@@ -284,7 +284,7 @@ vagrant@ubuntu2204:~$
 
 ```
 
-#### Смотрим на состояние и запускаем перебалансировку
+#### Смотрим на состояние
 
 Один узел недоступен
 
@@ -298,10 +298,15 @@ vagrant@ubuntu2204:~$
 
 ![image](https://github.com/ada04/NoSQL/assets/40420948/83600809-5d37-412b-9793-7d45b6f456a0)
 
-
-Запустили Rebalance
-
 ![image](https://github.com/ada04/NoSQL/assets/40420948/18857d78-966b-4770-8206-dd5d082ec4ad)
+
+
+#### После восстановления работоспособности узла нам будет предложено его восстановить
+
+![image](https://github.com/ada04/NoSQL/assets/40420948/6af996ed-c69c-4217-8787-c31cff0b87a3)
+
+
+#### Если запустить Rebalance - узел будет удален
 
 ![image](https://github.com/ada04/NoSQL/assets/40420948/c1257e2a-fbb0-42e4-9794-9aa7d56f0ad7)
 

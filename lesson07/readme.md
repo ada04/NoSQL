@@ -161,35 +161,147 @@ sudo docker inspect  compose_couchbase1_1
 
     http://192.168.1.19:8091 
 
-#### 1. На первом экране заполняем данные кластера
+#### 1. Создаем новый кластер
 
-|
-------------|----------
-ClusterName:| `couchb_cl`
-Admin:| `admin`
-Password:| `qwerty_123`
+![image](https://github.com/ada04/NoSQL/assets/40420948/4f5e9739-eb01-4ff2-9bc6-460be2d22bf0)
+
+Заполняем данные (запоминаем имя/пароль)
+
+ClusterName: `couchb_cl`
+Admin: `admin`
+Password: `qwerty_123`
 
 #### 2. Принимаем terms&conditions
 и нажимаем `Finish With Defaults` (но можно и посмотреть настройки распределения дисков и памяти в ручном режиме)
 
 #### 3. Заходим в раздел Servers
 Добавляем сервера `172.17.0.3` и `172.17.0.4`
+![image](https://github.com/ada04/NoSQL/assets/40420948/ed73104e-1727-47c9-8955-a0693bf5d032)
 
 Запускаем `Rebalance` (Кластер необходимо перебалансировать, чтобы обеспечить правильное распределение данных между вновь добавленными или удаленными узлами. )
-
-
-```bash
-```
 
 ### 2. Создать БД, наполнить небольшими тестовыми данными
 
 Заходим в раздел `Buckets` и выбираем `add simple bucket`. Загружаем тестовые данные **travel-sample**.
 
+Посмотрим запросы в датасете про перевозки [Примеры](https://docs.couchbase.com/cloud/get-started/run-first-queries.html)
+
+```sql
+SELECT t.airportname, t.city 
+FROM `travel-sample`.`inventory`.`airport` t
+WHERE  tz = "America/Anchorage"
+       AND geo.alt >= 2100;
+```
+
+```json
+[
+  {
+    "airportname": "Anaktuvuk Pass Airport",
+    "city": "Anaktuvuk Pass"
+  }
+]
+```
+
+```sql
+SELECT route.airlineid, airline.name, route.sourceairport, route.destinationairport
+FROM `travel-sample` route
+INNER JOIN `travel-sample` airline
+ON route.airlineid = META(airline).id
+WHERE route.type = "route"
+AND route.destinationairport = "SFO"
+ORDER BY route.sourceairport;
+```
+
+```json
+[
+  {
+    "airlineid": "airline_5209",
+    "destinationairport": "SFO",
+    "name": "United Airlines",
+    "sourceairport": "ABQ"
+  },
+  {
+    "airlineid": "airline_5209",
+    "destinationairport": "SFO",
+    "name": "United Airlines",
+    "sourceairport": "ACV"
+  },
+  {
+    "airlineid": "airline_5209",
+    "destinationairport": "SFO",
+    "name": "United Airlines",
+    "sourceairport": "AKL"
+  },
+```
+
+После получения результата можно посмотреть план выполнения запроса и рекомендации адвизора по созданию индексов
+
+![image](https://github.com/ada04/NoSQL/assets/40420948/a20ec163-4627-4674-81e5-044fa9b2ca8c)
+
+#### Проверим рекомендации... 
+
+Последний запрос выполнялся 5.7s вернув 185 docs и 27147 bytes
+Применим рекомендации и создадим индекс.
+Изменим условие выборки, чтобы получить немного другой результат, исключив чение прошлого результата из кэша.
+
+```sql
+SELECT route.airlineid, airline.name, route.sourceairport, route.destinationairport
+FROM `travel-sample` route
+INNER JOIN `travel-sample` airline
+ON route.airlineid = META(airline).id
+WHERE route.type = "route"
+AND route.destinationairport = "ATL"
+ORDER BY route.sourceairport;
+```
+
+Запускаем запрос и получаем результат через 197.8ms выдавший 558 docs и 81616 bytes
+ 
+**Вывод** рекомендации оказались действительно полезными в этом случае.
+
 
 ### 3. Проверить отказоустойчивость
 
+Останавливаем один узел
 ```bash
+sudo docker stop compose_couchbase1_1
 ```
 
 ```bash
+vagrant@ubuntu2204:~$ sudo docker ps
+CONTAINER ID   IMAGE              COMMAND                  CREATED        STATUS        PORTS                                                                                                                        NAMES
+e74c3f88e05e   couchbase/server   "/entrypoint.sh couc…"   18 hours ago   Up 18 hours   8091-8097/tcp, 9123/tcp, 11207/tcp, 11210/tcp, 11280/tcp, 18091-18097/tcp                                                    compose_couchbase2_1
+727bd1e6d417   couchbase/server   "/entrypoint.sh couc…"   18 hours ago   Up 18 hours   8091-8097/tcp, 9123/tcp, 11207/tcp, 11210/tcp, 11280/tcp, 18091-18097/tcp                                                    compose_couchbase1_1
+2a651c0faa23   couchbase/server   "/entrypoint.sh couc…"   18 hours ago   Up 18 hours   8094-8097/tcp, 9123/tcp, 0.0.0.0:8091-8093->8091-8093/tcp, 11207/tcp, 11280/tcp, 0.0.0.0:11210->11210/tcp, 18091-18097/tcp   compose_couchbase3_1
+vagrant@ubuntu2204:~$ sudo docker stop compose_couchbase1_1
+compose_couchbase1_1
+vagrant@ubuntu2204:~$ sudo docker ps
+CONTAINER ID   IMAGE              COMMAND                  CREATED        STATUS        PORTS                                                                                                                        NAMES
+e74c3f88e05e   couchbase/server   "/entrypoint.sh couc…"   18 hours ago   Up 18 hours   8091-8097/tcp, 9123/tcp, 11207/tcp, 11210/tcp, 11280/tcp, 18091-18097/tcp                                                    compose_couchbase2_1
+2a651c0faa23   couchbase/server   "/entrypoint.sh couc…"   18 hours ago   Up 18 hours   8094-8097/tcp, 9123/tcp, 0.0.0.0:8091-8093->8091-8093/tcp, 11207/tcp, 11280/tcp, 0.0.0.0:11210->11210/tcp, 18091-18097/tcp   compose_couchbase3_1
+vagrant@ubuntu2204:~$
+
 ```
+
+#### Смотрим на состояние и запускаем перебалансировку
+
+Один узел недоступен
+![image](https://github.com/ada04/NoSQL/assets/40420948/773f962e-cb4b-4123-af95-544c2836004d)
+
+Ожидание (failover установлен 30 сек)
+![image](https://github.com/ada04/NoSQL/assets/40420948/3f5dc2ae-10bf-427e-9c79-2ebd44514ae4)
+
+![image](https://github.com/ada04/NoSQL/assets/40420948/83600809-5d37-412b-9793-7d45b6f456a0)
+
+Запустили Rebalance
+![image](https://github.com/ada04/NoSQL/assets/40420948/18857d78-966b-4770-8206-dd5d082ec4ad)
+
+![image](https://github.com/ada04/NoSQL/assets/40420948/c1257e2a-fbb0-42e4-9794-9aa7d56f0ad7)
+
+Выполняем последний запрос и получаем тот же результат
+![image](https://github.com/ada04/NoSQL/assets/40420948/5fd8d35c-b52c-4026-95a7-bae66428aa74)
+
+
+
+
+
+

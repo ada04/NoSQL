@@ -176,7 +176,9 @@ Password: `qwerty_123`
 
 #### 3. Заходим в раздел Servers
 Добавляем сервера `172.17.0.3` и `172.17.0.4`
-![image](https://github.com/ada04/NoSQL/assets/40420948/ed73104e-1727-47c9-8955-a0693bf5d032)
+
+![image](https://github.com/ada04/NoSQL/assets/40420948/adbf17c9-1402-41a9-be4a-e3791c850e24)
+
 
 Запускаем `Rebalance` (Кластер необходимо перебалансировать, чтобы обеспечить правильное распределение данных между вновь добавленными или удаленными узлами. )
 
@@ -288,10 +290,11 @@ vagrant@ubuntu2204:~$
 
 ![image](https://github.com/ada04/NoSQL/assets/40420948/773f962e-cb4b-4123-af95-544c2836004d)
 
-Ожидание (failover установлен 30 сек)
+Ожидание (failover установлен 30 сек) Запрос не выполнился
 
-![image](https://github.com/ada04/NoSQL/assets/40420948/3f5dc2ae-10bf-427e-9c79-2ebd44514ae4)
+![image](https://github.com/ada04/NoSQL/assets/40420948/a57deb6c-9457-46cd-917b-cf0ce27f819c)
 
+После отработки файловера, запрос выполняется
 
 ![image](https://github.com/ada04/NoSQL/assets/40420948/83600809-5d37-412b-9793-7d45b6f456a0)
 
@@ -306,6 +309,22 @@ vagrant@ubuntu2204:~$
 
 ![image](https://github.com/ada04/NoSQL/assets/40420948/5fd8d35c-b52c-4026-95a7-bae66428aa74)
 
+Вернем узел в кластер
+
+```bash
+vagrant@ubuntu2204:~$ sudo docker start compose_couchbase1_1
+compose_couchbase1_1
+vagrant@ubuntu2204:~$ sudo docker ps
+CONTAINER ID   IMAGE              COMMAND                  CREATED        STATUS         PORTS                                                                                                                        NAMES
+e74c3f88e05e   couchbase/server   "/entrypoint.sh couc…"   18 hours ago   Up 18 hours    8091-8097/tcp, 9123/tcp, 11207/tcp, 11210/tcp, 11280/tcp, 18091-18097/tcp                                                    compose_couchbase2_1
+727bd1e6d417   couchbase/server   "/entrypoint.sh couc…"   18 hours ago   Up 2 seconds   8091-8097/tcp, 9123/tcp, 11207/tcp, 11210/tcp, 11280/tcp, 18091-18097/tcp                                                    compose_couchbase1_1
+2a651c0faa23   couchbase/server   "/entrypoint.sh couc…"   18 hours ago   Up 18 hours    8094-8097/tcp, 9123/tcp, 0.0.0.0:8091-8093->8091-8093/tcp, 11207/tcp, 11280/tcp, 0.0.0.0:11210->11210/tcp, 18091-18097/tcp   compose_couchbase3_1
+vagrant@ubuntu2204:~$
+```
+
+![image](https://github.com/ada04/NoSQL/assets/40420948/adffa1d9-ab2e-41b8-99c7-d1ceb8aad9d5)
+
+После ребалансировки у нас снова трехузловой кластер.
 
 
 

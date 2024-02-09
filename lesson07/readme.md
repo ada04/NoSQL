@@ -285,19 +285,25 @@ vagrant@ubuntu2204:~$
 #### Смотрим на состояние и запускаем перебалансировку
 
 Один узел недоступен
+
 ![image](https://github.com/ada04/NoSQL/assets/40420948/773f962e-cb4b-4123-af95-544c2836004d)
 
 Ожидание (failover установлен 30 сек)
+
 ![image](https://github.com/ada04/NoSQL/assets/40420948/3f5dc2ae-10bf-427e-9c79-2ebd44514ae4)
+
 
 ![image](https://github.com/ada04/NoSQL/assets/40420948/83600809-5d37-412b-9793-7d45b6f456a0)
 
+
 Запустили Rebalance
+
 ![image](https://github.com/ada04/NoSQL/assets/40420948/18857d78-966b-4770-8206-dd5d082ec4ad)
 
 ![image](https://github.com/ada04/NoSQL/assets/40420948/c1257e2a-fbb0-42e4-9794-9aa7d56f0ad7)
 
 Выполняем последний запрос и получаем тот же результат
+
 ![image](https://github.com/ada04/NoSQL/assets/40420948/5fd8d35c-b52c-4026-95a7-bae66428aa74)
 
 

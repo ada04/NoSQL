@@ -163,7 +163,7 @@ sudo docker inspect  compose_couchbase1_1
 
 #### 1. На первом экране заполняем данные кластера
 
-     1       |   2
+|
 ------------|----------
 ClusterName:| `couchb_cl`
 Admin:| `admin`

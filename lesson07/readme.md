@@ -294,23 +294,33 @@ vagrant@ubuntu2204:~$
 
 ![image](https://github.com/ada04/NoSQL/assets/40420948/a57deb6c-9457-46cd-917b-cf0ce27f819c)
 
-После отработки файловера, запрос выполняется
 
 ![image](https://github.com/ada04/NoSQL/assets/40420948/83600809-5d37-412b-9793-7d45b6f456a0)
 
-![image](https://github.com/ada04/NoSQL/assets/40420948/18857d78-966b-4770-8206-dd5d082ec4ad)
+После отработки файловера, запрос выполняется
+
 
 
 #### После восстановления работоспособности узла нам будет предложено его восстановить
 
+```bash
+vagrant@ubuntu2204:~$ sudo docker start compose_couchbase1_1
+compose_couchbase1_1
+```
+
 ![image](https://github.com/ada04/NoSQL/assets/40420948/6af996ed-c69c-4217-8787-c31cff0b87a3)
+
 
 
 #### Если запустить Rebalance - узел будет удален
 
 ![image](https://github.com/ada04/NoSQL/assets/40420948/c1257e2a-fbb0-42e4-9794-9aa7d56f0ad7)
 
-Выполняем последний запрос и получаем тот же результат
+
+![image](https://github.com/ada04/NoSQL/assets/40420948/19cf6db4-531f-438d-b3c6-624e91e699b8)
+
+
+Проверим работу запроса на двух узлах: Выполняем последний запрос и получаем тот же результат
 
 ![image](https://github.com/ada04/NoSQL/assets/40420948/5fd8d35c-b52c-4026-95a7-bae66428aa74)
 

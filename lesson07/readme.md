@@ -163,9 +163,9 @@ sudo docker inspect  compose_couchbase1_1
 
 #### 1. На первом экране заполняем данные кластера
 
-|ClusterName:| couchb_cl|
-|Admin:| admin|
-|Password:| qwerty_123|
+ClusterName:| `couchb_cl`
+Admin:| `admin`
+Password:| `qwerty_123`
 
 #### 2. Принимаем terms&conditions
 и нажимаем `Finish With Defaults` (но можно и посмотреть настройки распределения дисков и памяти в ручном режиме)

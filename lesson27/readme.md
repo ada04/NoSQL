@@ -96,6 +96,7 @@ tt connect create_db:instance001
 
 ```bash
 ```
+https://www.tarantool.io/ru/doc/latest/how-to/getting_started_db/
 
 
 

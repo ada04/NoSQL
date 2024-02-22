@@ -22,6 +22,7 @@
 
 ### Устанавливаем Tarantool на Ubuntu
 
+#### Docker образ
 Основной образ tarantool собран на основе alpine:3.15
 
 ```bash
@@ -31,7 +32,72 @@ docker run -it --rm tarantool/tarantool
 
 После установки докер-контейнера мы попадаем сразу в консоль Tarantool
 
-Создаем БД:
+#### Установка из репозитория
+Добавим репозиторий
+```bash
+curl -L https://tarantool.io/BraKbmW/release/3/installer.sh | bash
+```
+
+Усановка tarantool из репозитория (вдруг пригодится)
+```bash
+sudo apt-get -y install tarantool
+```
+
+Устанавливает ttCLI
+```bash
+apt-get install tt
+```
+
+##### Подготавливаем настройки
+ 
+```bash
+mkdir instances.enabled
+cd instances.enabled/
+mkdir create_db
+cd create_db/
+echo "instance001:" > instances.yaml
+touch config.yaml
+vi config.yaml
+```
+
+config.yaml
+```yaml
+groups:
+   group001:
+     replicasets:
+       replicaset001:
+         instances:
+           instance001:
+             iproto:
+               listen:
+               - uri: '127.0.0.1:3301'
+```
+
+##### Запуск экземпляра tarantool (если не в докере)
+
+Из директории с созданными файлами нстароек запускаем
+
+```bash
+tt start create_db
+```
+
+Просмотр статуса БД
+```bash
+tt status create_db
+```
+
+Подключаемся к БД
+```bash
+tt connect create_db:instance001
+```
+
+
+### Создаем БД:
+
+```bash
+```
+
+
 
 Создаем space с именем `bands`
 ```bash

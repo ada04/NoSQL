@@ -123,6 +123,71 @@ get /otus-hw/_search
 ```
 200 — OK (248 ms)
 
+        Skip to main content
+
+Trial - 14 days left
+
+
+D
+Cloud
+Deployments
+… 
+Elasticsearch
+API console
+Deployments
+otus
+Edit
+Monitoring
+Health
+Logs and metrics
+Performance
+Elasticsearch
+Snapshots
+API console
+Kibana
+Integrations Server
+Enterprise Search
+Activity
+Security
+Features
+Support
+API console
+Perform operations-related tasks from this console. You can run search queries, review the list of snapshots, check the health of your clusters, and more(opens in a new tab or window).
+
+GET
+/otus-hw/_search
+
+Recent
+
+Submit
+
+Advanced
+
+Press Enter to start editing.
+
+When you're done, press Escape to stop editing.
+
+  
+200 — OK (248 ms)
+
+{
+  "hits": {
+    "hits": [
+      {
+        "_score": 1.241674,
+        "_id": "1",
+        "_source": {
+          "text": "моя мама мыла посуду а кот жевал сосиски",
+          "id": "1"
+        },
+        "_index": "otus-hw"
+      },
+      {
+        "_score": 0.5820575,
+        "_id": "3",
+        "_source": {
+          "text": "мама мыла раму",
+          "id": "3"
         },
         "_index": "otus-hw"
       },
@@ -135,20 +200,5 @@ get /otus-hw/_search
         },
         "_index": "otus-hw"
       }
-    ],
-    "total": {
-      "relation": "eq",
-      "value": 3
-    },
-    "max_score": 1.241674
-  },
-  "_shards": {
-    "successful": 1,
-    "failed": 0,
-    "skipped": 0,
-    "total": 1
-  },
-  "took": 9,
-  "timed_out": false
-}
+
 ```

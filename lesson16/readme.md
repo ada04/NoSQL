@@ -29,3 +29,20 @@ sudo apt-get update
 sudo apt-get install redis
 ```
 
+#### если используем docker
+```bash
+docker pull redis
+docker run --name otus-redis -d redis
+docker exec -it otus-redis redis-cli
+```
+
+Запускаем докер-контейнер
+```bash
+sudo docker run --name redis_cont -e ALLOW_EMPTY_PASSWORD=yes -p 6379:6379 -d redis
+```
+
+### GUI
+Устанавливаем GUI `https://redis.com/redis-enterprise/redis-insight/`
+
+### Загружаем данные
+

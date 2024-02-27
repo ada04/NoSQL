@@ -42,7 +42,7 @@ sudo docker run --name redis_cont -e ALLOW_EMPTY_PASSWORD=yes -p 6379:6379 -d re
 ```
 
 ### GUI
-Устанавливаем GUI `https://redis.com/redis-enterprise/redis-insight/`
+Устанавливаем GUI https://redis.com/redis-enterprise/redis-insight/
 
 ### Загружаем данные
 
@@ -120,7 +120,9 @@ print(f'{i} rows')
 ### Промежуточные выводы
 
 ВМ с Redis была развернута в VirtualBox с выделением 16Гб ОЗУ. Для теста было загружено 10000 "записей" в различных форматах.
+
 В результате сделан вывод по использованию именно этого набора данных: для него хорошо подходит HASH, но совсем не подходит string или list.
+
 Список всех комманд - https://redis.io/commands/
 
 

@@ -47,9 +47,11 @@ sudo docker run --name redis_cont -e ALLOW_EMPTY_PASSWORD=yes -p 6379:6379 -d re
 ### Загружаем данные
 
 Для тестирования был взят обезличенный набор данных, содержащий информацию по получению услуг: В качестве ключа был взят код записи (id), в списках и множествах код услуги (u_id)
+
 ![image](https://github.com/ada04/NoSQL/assets/40420948/6f17c109-b404-4cf7-8932-d27d83257a6c)
 
 Для загрузки использовался код, написанный на языке Python
+
 ```python
 import json
 import redis

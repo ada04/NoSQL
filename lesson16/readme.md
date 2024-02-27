@@ -197,3 +197,16 @@ LTRIM user:1:posts 0 9
 
 #### Основные команды
 `RPUSH, LPUSH, LTRIM, LLEN, LRANGE, LINDEX, RPOP, LPOP`
+
+### Отчет о БД после загрузки данных
+
+![image](https://github.com/ada04/NoSQL/assets/40420948/cb69df01-d40e-43c4-a463-4e6aad740293)
+
+![image](https://github.com/ada04/NoSQL/assets/40420948/ad3fb1d1-3766-45d2-8b20-d74bc47542be)
+
+![image](https://github.com/ada04/NoSQL/assets/40420948/1fda4521-043c-40f1-858e-2f4cbda5d51a)
+
+### Тайминги выполнения некоторых запросов
+
+![image](https://github.com/ada04/NoSQL/assets/40420948/165c18cf-dceb-4c06-af9d-d3d3460aecfd)
+

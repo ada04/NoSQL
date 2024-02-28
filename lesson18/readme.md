@@ -51,7 +51,7 @@ Create the Consul datacenter
 docker-compose up --detach
 ```
 
-(w)[http://192.168.1.22:8500/ui/dc1/services]
+Результат:
 
 ```bash
 vagrant@ubuntu2204:~/consul/learn-consul-docker/datacenter-deploy-secure$ sudo docker-compose up --detach
@@ -79,4 +79,15 @@ consul-server2  172.18.0.5:8301  alive   server  1.11.2  2         dc1  default 
 consul-server3  172.18.0.2:8301  alive   server  1.11.2  2         dc1  default    <all>
 consul-client   172.18.0.3:8301  alive   client  1.11.2  2         dc1  default    <default>
 vagrant@ubuntu2204:~/consul/learn-consul-docker/datacenter-deploy-secure$
+```
+
+(Веб консоль: )[http://192.168.1.22:8500/ui/dc1/services]
+
+Подключаемся к контейнеру и смотрим состояние:
+
+```bash
+sudo docker exec consul-client consul members
+# or
+sudo docker exec -it consul-client /bin/sh
+consul members
 ```

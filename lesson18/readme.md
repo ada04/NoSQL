@@ -210,3 +210,13 @@ vagrant@ubuntu2204:~/consul$
 ### Вывод
 
 Может чего и не донастроил, однако при остановке хоста, который был лидером, новый не выбирается пока хост не поднимется.
+
+### Остановка всех контейнеров
+```bash
+vagrant@ubuntu2204:~/consul/learn-consul-docker/datacenter-deploy-secure$ sudo docker-compose stop
+[+] Stopping 4/4
+ ✔ Container consul-server1  Stopped                                                                                                             0.6s
+ ✔ Container consul-server2  Stopped                                                                                                             0.4s
+ ✔ Container consul-server3  Stopped                                                                                                             0.5s
+ ✔ Container consul-client   Stopped
+```

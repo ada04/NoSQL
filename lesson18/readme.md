@@ -90,4 +90,121 @@ sudo docker exec consul-client consul members
 # or
 sudo docker exec -it consul-client /bin/sh
 consul members
+consul operator raft list-peers
 ```
+
+#### Настраиваем агента
+
+на 1-3-м сервере (рабочий вариант)
+```bash
+echo '{
+        "service": {
+            "id": "web",
+            "name": "web",
+            "tags": [ "consul" ],
+            "port": 80,
+            "enable_tag_override": false,
+            "check": {
+                "id": "web_up",
+                "name": "consul healthcheck",
+                "tcp": "localhost:8500",
+                "interval": "10s",
+                "timeout": "2s"
+            }
+        },
+       "enable_script_checks": true,
+       "enable_local_script_checks": true
+    }' > /consul/config/web.json
+
+consul validate /consul/config/
+consul reload
+##consul services register -name=web
+```
+
+### Тестируем отказоустойчивость
+
+```bash
+sudo docker exec consul-client consul members
+sudo docker exec consul-client consul operator raft list-peers
+sudo docker stop consul-server3
+sudo docker stop consul-server1
+
+```
+
+```bash
+vagrant@ubuntu2204:~/consul$ sudo docker exec consul-client consul members
+Node            Address          Status  Type    Build   Protocol  DC   Partition  Segment
+consul-server1  172.18.0.4:8301  alive   server  1.11.2  2         dc1  default    <all>
+consul-server2  172.18.0.5:8301  alive   server  1.11.2  2         dc1  default    <all>
+consul-server3  172.18.0.2:8301  alive   server  1.11.2  2         dc1  default    <all>
+consul-client   172.18.0.3:8301  alive   client  1.11.2  2         dc1  default    <default>
+vagrant@ubuntu2204:~/consul$ sudo docker exec consul-client consul operator raft list-peers
+Node            ID                                    Address          State     Voter  RaftProtocol
+consul-server3  691589e9-212b-790e-2539-eca14d55bcf9  172.18.0.2:8300  follower  true   3
+consul-server1  b0e3d1ad-c9b5-ec0c-c15e-9de351a101bd  172.18.0.4:8300  follower  true   3
+consul-server2  1aece920-2abe-bf97-afb9-93106baf619b  172.18.0.5:8300  leader    true   3
+vagrant@ubuntu2204:~/consul$ sudo docker stop consul-server3
+consul-server3
+vagrant@ubuntu2204:~/consul$ sudo docker exec consul-client consul operator raft list-peers
+Node            ID                                    Address          State     Voter  RaftProtocol
+consul-server1  b0e3d1ad-c9b5-ec0c-c15e-9de351a101bd  172.18.0.4:8300  follower  true   3
+consul-server2  1aece920-2abe-bf97-afb9-93106baf619b  172.18.0.5:8300  leader    true   3
+vagrant@ubuntu2204:~/consul$ sudo docker exec consul-client consul members
+Node            Address          Status  Type    Build   Protocol  DC   Partition  Segment
+consul-server1  172.18.0.4:8301  alive   server  1.11.2  2         dc1  default    <all>
+consul-server2  172.18.0.5:8301  alive   server  1.11.2  2         dc1  default    <all>
+consul-server3  172.18.0.2:8301  left    server  1.11.2  2         dc1  default    <all>
+consul-client   172.18.0.3:8301  alive   client  1.11.2  2         dc1  default    <default>
+vagrant@ubuntu2204:~/consul$ sudo docker stop consul-server1
+consul-server1
+vagrant@ubuntu2204:~/consul$ sudo docker exec consul-client consul members
+Node            Address          Status  Type    Build   Protocol  DC   Partition  Segment
+consul-server1  172.18.0.4:8301  failed  server  1.11.2  2         dc1  default    <all>
+consul-server2  172.18.0.5:8301  alive   server  1.11.2  2         dc1  default    <all>
+consul-server3  172.18.0.2:8301  left    server  1.11.2  2         dc1  default    <all>
+consul-client   172.18.0.3:8301  alive   client  1.11.2  2         dc1  default    <default>
+vagrant@ubuntu2204:~/consul$ sudo docker exec consul-client consul operator raft list-peers
+Error getting peers: Failed to retrieve raft configuration: Unexpected response code: 500 (rpc error making call: No cluster leader)
+vagrant@ubuntu2204:~/consul$ sudo docker start consul-server1
+consul-server1
+vagrant@ubuntu2204:~/consul$ sudo docker exec consul-client consul operator raft list-peers
+Node            ID                                    Address          State     Voter  RaftProtocol
+(unknown)       b0e3d1ad-c9b5-ec0c-c15e-9de351a101bd  172.18.0.4:8300  follower  true   unknown
+consul-server2  1aece920-2abe-bf97-afb9-93106baf619b  172.18.0.5:8300  leader    true   3
+vagrant@ubuntu2204:~/consul$ sudo docker exec consul-client consul operator raft list-peers
+Node            ID                                    Address          State     Voter  RaftProtocol
+consul-server1  b0e3d1ad-c9b5-ec0c-c15e-9de351a101bd  172.18.0.2:8300  follower  true   3
+consul-server2  1aece920-2abe-bf97-afb9-93106baf619b  172.18.0.5:8300  leader    true   3
+vagrant@ubuntu2204:~/consul$ sudo docker start consul-server3
+consul-server3
+vagrant@ubuntu2204:~/consul$ sudo docker stop consul-server2
+consul-server2
+vagrant@ubuntu2204:~/consul$ sudo docker exec consul-client consul operator raft list-peers
+Error getting peers: Failed to retrieve raft configuration: Unexpected response code: 500 (rpc error making call: Raft leader not found in server lookup mapping)
+vagrant@ubuntu2204:~/consul$ sudo docker exec consul-client consul operator raft list-peers
+Error getting peers: Failed to retrieve raft configuration: Unexpected response code: 500 (rpc error making call: No cluster leader)
+vagrant@ubuntu2204:~/consul$ sudo docker exec consul-client consul operator raft list-peers
+Error getting peers: Failed to retrieve raft configuration: Unexpected response code: 500 (rpc error making call: No cluster leader)
+vagrant@ubuntu2204:~/consul$ sudo docker exec consul-client consul members
+Node            Address          Status  Type    Build   Protocol  DC   Partition  Segment
+consul-server1  172.18.0.2:8301  alive   server  1.11.2  2         dc1  default    <all>
+consul-server2  172.18.0.5:8301  failed  server  1.11.2  2         dc1  default    <all>
+consul-server3  172.18.0.4:8301  alive   server  1.11.2  2         dc1  default    <all>
+consul-client   172.18.0.3:8301  alive   client  1.11.2  2         dc1  default    <default>
+vagrant@ubuntu2204:~/consul$ sudo docker start consul-server2
+consul-server2
+vagrant@ubuntu2204:~/consul$ sudo docker exec consul-client consul members
+Node            Address          Status  Type    Build   Protocol  DC   Partition  Segment
+consul-server1  172.18.0.2:8301  alive   server  1.11.2  2         dc1  default    <all>
+consul-server2  172.18.0.5:8301  alive   server  1.11.2  2         dc1  default    <all>
+consul-server3  172.18.0.4:8301  alive   server  1.11.2  2         dc1  default    <all>
+consul-client   172.18.0.3:8301  alive   client  1.11.2  2         dc1  default    <default>
+vagrant@ubuntu2204:~/consul$ sudo docker exec consul-client consul operator raft list-peers
+Node            ID                                    Address          State     Voter  RaftProtocol
+consul-server1  b0e3d1ad-c9b5-ec0c-c15e-9de351a101bd  172.18.0.2:8300  leader    true   3
+consul-server2  1aece920-2abe-bf97-afb9-93106baf619b  172.18.0.5:8300  follower  true   3
+consul-server3  691589e9-212b-790e-2539-eca14d55bcf9  172.18.0.4:8300  follower  true   3
+vagrant@ubuntu2204:~/consul$
+```
+
+### Вывод

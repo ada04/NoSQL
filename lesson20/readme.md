@@ -6,6 +6,20 @@
 [movie.txt](movie.txt)
 
 
+### Практика - Создание нод и ребер (Фильм, режиссер и два актёра)
+```cypher
+create (:Director {name: 'Martin Scorsese'})
+create (:Movie {title: 'Shutter Island'})
+create (:Actor {name:'Leonardo DiCaprio'})
+create (:Actor {name:'Mark Ruffalo'})
+match (martin:Director {name:'Martin Scorsese'})
+match (shutter:Movie {title: 'Shutter Island'})
+create (martin) -[:CREATED]-> (shutter)
+match (leo:Actor {name: 'Leonardo DiCaprio'} )
+match (mark:Actor {name:'Mark Ruffalo'})
+create (leo) -[:PLAYED_IN]-> (shutter)
+create (mark) -[:PLAYED_IN]-> (shutter)
+```
 
 # Домашнее задание
 

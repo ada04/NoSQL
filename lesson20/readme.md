@@ -116,7 +116,8 @@ MATCH (from:airport { town:'Tumen' }), (to:airport { town: 'Sochi'}) , path = (f
 RETURN path, length(path)
 ```
 
-![image](https://github.com/ada04/NoSQL/assets/40420948/8cc2f5a2-8cfe-45cf-824b-2e2a4d5b12a9)
+![image](https://github.com/ada04/NoSQL/assets/40420948/fa8796da-d347-4475-9f05-8e65ea3e588c)
+
 
 
 

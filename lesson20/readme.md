@@ -29,6 +29,11 @@ match (mark:Actor {name:'Mark Ruffalo'})
 create (mark) -[:PLAYED_IN]-> (shutter)
 ```
 
+Удалить ноду без метки по ID:
+```cypher
+match (s) where ID(s) = 10 detach delete s
+```
+
 # Домашнее задание
 
 Сравнение с неграфовыми БД

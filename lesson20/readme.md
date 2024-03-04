@@ -9,15 +9,23 @@
 ### Практика - Создание нод и ребер (Фильм, режиссер и два актёра)
 ```cypher
 create (:Director {name: 'Martin Scorsese'})
+
 create (:Movie {title: 'Shutter Island'})
+
 create (:Actor {name:'Leonardo DiCaprio'})
+
 create (:Actor {name:'Mark Ruffalo'})
+
 match (martin:Director {name:'Martin Scorsese'})
 match (shutter:Movie {title: 'Shutter Island'})
 create (martin) -[:CREATED]-> (shutter)
+
 match (leo:Actor {name: 'Leonardo DiCaprio'} )
-match (mark:Actor {name:'Mark Ruffalo'})
+match (shutter:Movie {title: 'Shutter Island'})
 create (leo) -[:PLAYED_IN]-> (shutter)
+
+match (shutter:Movie {title: 'Shutter Island'})
+match (mark:Actor {name:'Mark Ruffalo'})
 create (mark) -[:PLAYED_IN]-> (shutter)
 ```
 

@@ -98,10 +98,21 @@ create (svo) -[:FLYGHT {airline:'AFL', price: 8500}]-> (aer)
 create (svo) -[:FLYGHT {airline:'AFL', price: 22000}]-> (ist)
 create (svo) -[:FLYGHT {airline:'AFL', price: 20000}]-> (tjm)
 create (aer) -[:FLYGHT {airline:'AFL', price: 15000}]-> (ist)
-create (vko) -[:FLYGHT {airline:'SDM', price: 12000}]-> (tjm)
-create (vko) -[:FLYGHT {airline:'UTA', price: 11000}]-> (tjm)
+create (tjm) -[:FLYGHT {airline:'SDM', price: 12000}]-> (vko)
+create (tjm) -[:FLYGHT {airline:'UTA', price: 11000}]-> (vko)
 create (vko) -[:FLYGHT {airline:'UTA', price: 10000}]-> (aer)
 create (vko) -[:FLYGHT {airline:'SDM', price: 18000}]-> (ist)
+
+
+create (spb: airport {name: 'SPb', vpp:2, isata: 'SPB', town: 'Sankt-Petersburg')
+match(svo:airport {iata: 'SVO'})
+match(aer:airport {iata: 'AER'})
+create (svo) -[:FLYGHT {airline:'AFL', price: 4500}]-> (spb)
+create (spb) -[:FLYGHT {airline:'AFL', price: 9500}]-> (aer)
+
+
+
+
 create (aer) -[:FLYGHT {airline:'AFL', price: 8500}]-> (svo)
 create (ist) -[:FLYGHT {airline:'AFL', price: 22000}]-> (svo)
 create (tjm) -[:FLYGHT {airline:'AFL', price: 20000}]-> (svo)
@@ -115,6 +126,9 @@ create (ist) -[:FLYGHT {airline:'SDM', price: 18000}]-> (vko)
   Created 8 nodes, created 24 relationships, set 61 properties, added 8 labels
 
 ![image](https://github.com/ada04/NoSQL/assets/40420948/e37c74d9-a225-4774-9151-5363320b7e8c)
+
+![image](https://github.com/ada04/NoSQL/assets/40420948/ff1bb3bd-7f90-44f2-a729-4b058eed9a86)
+
 
 ```cypher
 MATCH (from:airport { town:'Tumen' }), (to:airport { town: 'Sochi'}) , cost = (from)-[:FLYGHT]->(to) 

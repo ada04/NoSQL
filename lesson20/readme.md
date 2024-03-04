@@ -75,6 +75,39 @@ match (gl:People {name:'Gleb'}) -[*1..4]- (c:Company) return c
 
 ![visualisation (1)](https://github.com/ada04/NoSQL/assets/40420948/605eeb91-153c-4de3-ac7c-b4e2febb2438)
 
-
+```cypher
+create (a1:airline {name: 'Aeroflot', code:'AFL', base:'Moscow'})
+create (r1:airline {name: 'Rossia', code:'SDM', base: 'Sankt-Petersburg'})
+create (u1:airline {name: 'Utair', code: 'UTA', base:'Tumen'})
+create (svo:airport {name: 'Sheremetevo', vpp: 3, iata: 'SVO', town: 'Moscow'})
+create (vko:airport {name: 'Vnukovo', vpp:2, iata: 'VKO', town: 'Moscow'})
+create (aer:airport {name: 'Adler', vpp:2, iata: 'AER', town: 'Sochi'})
+create (ist:airport {name: 'Istambul Havalimani Camii', vpp: 5, iata:'IST', town: 'Istambul'})
+create (tjm:airport {name: 'Roschino', vpp: 2, iata:'TJM', town:'Tumen'})
+create (a1) -[:FLY]-> (svo)
+create (a1) -[:FLY]-> (aer)
+create (a1) -[:FLY]-> (ist)
+create (r1) -[:FLY]-> (vko)
+create (r1) -[:FLY]-> (aer)
+create (r1) -[:FLY]-> (tjm)
+create (u1) -[:FLY]-> (vko)
+create (u1) -[:FLY]-> (tjm)
+create (svo) -[:FLYGHT {airline:'AFL', price: 8500}]-> (aer)
+create (svo) -[:FLYGHT {airline:'AFL', price: 22000}]-> (ist)
+create (svo) -[:FLYGHT {airline:'AFL', price: 20000}]-> (tjm)
+create (aer) -[:FLYGHT {airline:'AFL', price: 15000}]-> (ist)
+create (vko) -[:FLYGHT {airline:'SDM', price: 12000}]-> (tjm)
+create (vko) -[:FLYGHT {airline:'UTA', price: 11000}]-> (tjm)
+create (vko) -[:FLYGHT {airline:'UTA', price: 10000}]-> (aer)
+create (vko) -[:FLYGHT {airline:'SDM', price: 18000}]-> (ist)
+create (aer) -[:FLYGHT {airline:'AFL', price: 8500}]-> (svo)
+create (ist) -[:FLYGHT {airline:'AFL', price: 22000}]-> (svo)
+create (tjm) -[:FLYGHT {airline:'AFL', price: 20000}]-> (svo)
+create (ist) -[:FLYGHT {airline:'AFL', price: 15000}]-> (aer)
+create (tjm) -[:FLYGHT {airline:'SDM', price: 12000}]-> (vko)
+create (tjm) -[:FLYGHT {airline:'UTA', price: 11000}]-> (vko)
+create (aer) -[:FLYGHT {airline:'UTA', price: 10000}]-> (vko)
+create (ist) -[:FLYGHT {airline:'SDM', price: 18000}]-> (vko)
+```
 
 

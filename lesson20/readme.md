@@ -75,6 +75,8 @@ match (gl:People {name:'Gleb'}) -[*1..4]- (c:Company) return c
 
 ![visualisation (1)](https://github.com/ada04/NoSQL/assets/40420948/605eeb91-153c-4de3-ac7c-b4e2febb2438)
 
+### Аэропорты/Авиакомпании
+
 ```cypher
 create (a1:airline {name: 'Aeroflot', code:'AFL', base:'Moscow'})
 create (r1:airline {name: 'Rossia', code:'SDM', base: 'Sankt-Petersburg'})
@@ -110,4 +112,7 @@ create (aer) -[:FLYGHT {airline:'UTA', price: 10000}]-> (vko)
 create (ist) -[:FLYGHT {airline:'SDM', price: 18000}]-> (vko)
 ```
 
+  Created 8 nodes, created 24 relationships, set 61 properties, added 8 labels
+
+![image](https://github.com/ada04/NoSQL/assets/40420948/e37c74d9-a225-4774-9151-5363320b7e8c)
 

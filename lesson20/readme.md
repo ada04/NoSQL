@@ -69,3 +69,12 @@ match (n) return n
 
 ![visualisation](https://github.com/ada04/NoSQL/assets/40420948/62e2a85b-d324-433d-ba16-d11ff25033e5)
 
+```cypher
+match (gl:People {name:'Gleb'}) -[*1..4]- (c:Company) return c
+```
+
+![visualisation (1)](https://github.com/ada04/NoSQL/assets/40420948/605eeb91-153c-4de3-ac7c-b4e2febb2438)
+
+
+
+

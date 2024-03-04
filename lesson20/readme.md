@@ -118,8 +118,7 @@ RETURN path, length(path)
 
 ![image](https://github.com/ada04/NoSQL/assets/40420948/fa8796da-d347-4475-9f05-8e65ea3e588c)
 
-
-
+Попытка посчитать стоимость... что-то пошло не так...
 
 ```cypher
 MATCH (from:airport { town:'Tumen' }), (to:airport { town: 'Sochi'}) , cost = (from)-[:FLYGHT]->(to) 
@@ -128,3 +127,5 @@ length(cost),
 min(reduce(price = 0, r in relationships(FLYGHT) | price+r.price)) AS totalPrice
 ORDER BY length(cost), totalPrice
 ```
+
+### Сравенение с RDBMS

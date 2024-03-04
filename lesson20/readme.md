@@ -53,3 +53,19 @@ match (s) where ID(s) = 10 detach delete s
 
 ## Описание/Пошаговая инструкция выполнения домашнего задания:
 
+### Друзья/коллеги
+
+```cypher
+create (a1:People {name: 'Andrew'}) -[:WORKED]-> (mgu:Company {name: 'MGU'}) <-[:STUDIES]- (:People {name: 'Gleb'})
+create (v1:People {name: 'Vitaly'}) -[:STUDIES]-> (osu:Company {name: 'OSU'}) <-[:STUDIES]- (a1)
+create (s1:People {name: 'Sergey'}) -[:WORKED]-> (tnk:Company {name: 'TNK'}) <-[:WORKED]- (v1)
+create (i1:People {name: 'Ivan'}) -[:WORKED]-> (rn:Company {name: 'RN'}) <-[:WORKED]- (s1)
+create (i1) -[:STUDIES]-> (osu)
+```
+
+```cypher
+match (n) return n
+```
+
+![visualisation](https://github.com/ada04/NoSQL/assets/40420948/62e2a85b-d324-433d-ba16-d11ff25033e5)
+

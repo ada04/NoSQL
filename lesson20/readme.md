@@ -86,6 +86,7 @@ create (vko:airport {name: 'Vnukovo', vpp:2, iata: 'VKO', town: 'Moscow'})
 create (aer:airport {name: 'Adler', vpp:2, iata: 'AER', town: 'Sochi'})
 create (ist:airport {name: 'Istambul Havalimani Camii', vpp: 5, iata:'IST', town: 'Istambul'})
 create (tjm:airport {name: 'Roschino', vpp: 2, iata:'TJM', town:'Tumen'})
+create (spb: airport {name: 'SPb', vpp:2, isata: 'SPB', town: 'Sankt-Petersburg'})
 create (a1) -[:FLY]-> (svo)
 create (a1) -[:FLY]-> (aer)
 create (a1) -[:FLY]-> (ist)
@@ -102,15 +103,8 @@ create (tjm) -[:FLYGHT {airline:'SDM', price: 12000}]-> (vko)
 create (tjm) -[:FLYGHT {airline:'UTA', price: 11000}]-> (vko)
 create (vko) -[:FLYGHT {airline:'UTA', price: 10000}]-> (aer)
 create (vko) -[:FLYGHT {airline:'SDM', price: 18000}]-> (ist)
-
-
-create (spb: airport {name: 'SPb', vpp:2, isata: 'SPB', town: 'Sankt-Petersburg')
-match(svo:airport {iata: 'SVO'})
-match(aer:airport {iata: 'AER'})
 create (svo) -[:FLYGHT {airline:'AFL', price: 4500}]-> (spb)
 create (spb) -[:FLYGHT {airline:'AFL', price: 9500}]-> (aer)
-
-
 
 
 create (aer) -[:FLYGHT {airline:'AFL', price: 8500}]-> (svo)
@@ -121,6 +115,10 @@ create (tjm) -[:FLYGHT {airline:'SDM', price: 12000}]-> (vko)
 create (tjm) -[:FLYGHT {airline:'UTA', price: 11000}]-> (vko)
 create (aer) -[:FLYGHT {airline:'UTA', price: 10000}]-> (vko)
 create (ist) -[:FLYGHT {airline:'SDM', price: 18000}]-> (vko)
+
+match(svo:airport {iata: 'SVO'})
+match(aer:airport {iata: 'AER'})
+
 ```
 
   Created 8 nodes, created 24 relationships, set 61 properties, added 8 labels

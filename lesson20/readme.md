@@ -116,3 +116,10 @@ create (ist) -[:FLYGHT {airline:'SDM', price: 18000}]-> (vko)
 
 ![image](https://github.com/ada04/NoSQL/assets/40420948/e37c74d9-a225-4774-9151-5363320b7e8c)
 
+```cypher
+MATCH (from:airport { town:'Tumen' }), (to:airport { town: 'Sochi'}) , cost = (from)-[:FLYGHT]->(to) 
+RETURN cost, 
+length(cost),  
+min(reduce(price = 0, r in relationships(FLYGHT) | price+r.price)) AS totalPrice
+ORDER BY length(cost), totalPrice
+```

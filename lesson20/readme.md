@@ -29,6 +29,11 @@ match (mark:Actor {name:'Mark Ruffalo'})
 create (mark) -[:PLAYED_IN]-> (shutter)
 ```
 
+```cypher
+create (:Director {name:'Martin Scorsese'}) -[:CREATED]-> (shut:Movie {title:'Shutter Island'}) <-[:PLAYED_IN]- (:Actor {name: 'Leonardo DiCaprio'})
+
+```
+
 Удалить ноду без метки по ID:
 ```cypher
 match (s) where ID(s) = 10 detach delete s

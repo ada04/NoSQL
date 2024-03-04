@@ -105,27 +105,19 @@ create (vko) -[:FLYGHT {airline:'UTA', price: 10000}]-> (aer)
 create (vko) -[:FLYGHT {airline:'SDM', price: 18000}]-> (ist)
 create (svo) -[:FLYGHT {airline:'AFL', price: 4500}]-> (spb)
 create (spb) -[:FLYGHT {airline:'AFL', price: 9500}]-> (aer)
-
-
-create (svo) -[:FLYGHT {airline:'AFL', price: 20000}]-> (tjm)
-create (aer) -[:FLYGHT {airline:'AFL', price: 8500}]-> (svo)
-create (ist) -[:FLYGHT {airline:'AFL', price: 22000}]-> (svo)
-create (ist) -[:FLYGHT {airline:'AFL', price: 15000}]-> (aer)
-create (tjm) -[:FLYGHT {airline:'SDM', price: 12000}]-> (vko)
-create (tjm) -[:FLYGHT {airline:'UTA', price: 11000}]-> (vko)
-create (aer) -[:FLYGHT {airline:'UTA', price: 10000}]-> (vko)
-create (ist) -[:FLYGHT {airline:'SDM', price: 18000}]-> (vko)
-
-match(svo:airport {iata: 'SVO'})
-match(aer:airport {iata: 'AER'})
-
 ```
 
-  Created 8 nodes, created 24 relationships, set 61 properties, added 8 labels
+Created 9 nodes, created 18 relationships, set 53 properties, added 9 labels
 
-![image](https://github.com/ada04/NoSQL/assets/40420948/e37c74d9-a225-4774-9151-5363320b7e8c)
+![image](https://github.com/ada04/NoSQL/assets/40420948/28f82d28-d109-4d2a-8f45-a30c09b1c24f)
 
-![image](https://github.com/ada04/NoSQL/assets/40420948/ff1bb3bd-7f90-44f2-a729-4b058eed9a86)
+```cypher
+MATCH (from:airport { town:'Tumen' }), (to:airport { town: 'Sochi'}) , path = (from)-[:FLYGHT *1..5]->(to) 
+RETURN path, length(path)
+```
+
+![image](https://github.com/ada04/NoSQL/assets/40420948/8cc2f5a2-8cfe-45cf-824b-2e2a4d5b12a9)
+
 
 
 ```cypher

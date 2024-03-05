@@ -180,3 +180,18 @@ insert into ada.flight(fn, airline, price, afrom, ato) values ('R202', 'SDM', 18
 insert into ada.flight(fn, airline, price, afrom, ato) values ('SU05', 'AFL', 4500, 'SVO','SPB');
 insert into ada.flight(fn, airline, price, afrom, ato) values ('SU06', 'AFL', 9500, 'SPB','AER');
 ```
+
+
+```sql
+select lpad(' ', 3*level)||afrom||' -> '||ato||' ('||airline||')', price, level  from ADA.flight
+start with afrom = (select iata from ada.airport where town='Tumen')
+connect by prior ato = afrom
+and afrom <> 'AER'
+;
+```
+
+![image](https://github.com/ada04/NoSQL/assets/40420948/ef7fb262-9303-456b-873d-2ded0a0959c0)
+
+## Вывод
+
+Для данного примера моих знаний оказалось недостаточно для полноценной реализации задуманнного ни на Neo4j ни только с использованием SQL для Oracle, но можно сделать выводЮ, что в Neo4j данный пример мне понравился более интересным, чем в RDBMS БД.

@@ -129,3 +129,54 @@ ORDER BY length(cost), totalPrice
 ```
 
 ### Сравенение с RDBMS
+
+Создаем структуру, аналогичную второму примеру (используем СУБД Oracle)
+```sql
+create table ada.airline (code varchar2(5), name varchar2(20), base varchar2(50),
+constraint airline_pk primary key (code));
+
+create table ada.airport (iata varchar2(5), name varchar2(50), town varchar2(50), vpp number(1),
+constraint airport_pk primary key (iata));
+
+create table ada.flight (fn varchar2(10), price number(10,2), airline varchar2(5), afrom varchar2(5), ato varchar2(5),
+constraint flight_pk primary key (fn),
+constraint flight_fk_airline FOREIGN key (airline) REFERENCES ada.airline(code),
+constraint flight_fk_afrom FOREIGN key (afrom) REFERENCES ada.airport(iata),
+constraint flight_fk_ato FOREIGN key (ato) REFERENCES ada.airport(iata));
+
+create table ada.airline_airport (code varchar2(5), iata varchar2(5),
+constraint airline_airport_pk primary key (code, iata),
+constraint airline_airport_fk_airline foreign key (code) REFERENCES ada.airline(code),
+constraint airline_airport_fk2_airport foreign key (iata) REFERENCES ada.airport(iata));
+
+insert into ada.airline(name, code, base) values ('Aeroflot', 'AFL', 'Moscow');
+insert into ada.airline(name, code, base) values ('Rossia', 'SDM', 'Sankt-Petersburg');
+insert into ada.airline(name, code, base) values ('Utair', 'UTA', 'Tumen');
+
+insert into ada.airport (name, vpp, iata, town) values ('Sheremetevo', 3, 'SVO', 'Moscow');
+insert into ada.airport (name, vpp, iata, town) values ('Vnukovo', 2, 'VKO', 'Moscow');
+insert into ada.airport (name, vpp, iata, town) values ('Adler', 2, 'AER', 'Sochi');
+insert into ada.airport (name, vpp, iata, town) values ('Istambul Havalimani Camii', 5, 'IST', 'Istambul');
+insert into ada.airport (name, vpp, iata, town) values ('Roschino', 2, 'TJM', 'Tumen');
+insert into ada.airport (name, vpp, iata, town) values ('SPb', 2, 'SPB', 'Sankt-Petersburg');
+
+insert into ada.airline_airport (code, iata) values ('AFL','SVO');
+insert into ada.airline_airport (code, iata) values ('AFL','AER');
+insert into ada.airline_airport (code, iata) values ('AFL','SVO');
+insert into ada.airline_airport (code, iata) values ('SDM','VKO');
+insert into ada.airline_airport (code, iata) values ('SDM','AER');
+insert into ada.airline_airport (code, iata) values ('SDM','TJM');
+insert into ada.airline_airport (code, iata) values ('UTA','VKO');
+insert into ada.airline_airport (code, iata) values ('UTA','TJM');
+
+insert into ada.flight(fn, airline, price, afrom, ato) values ('SU01', 'AFL', 8500, 'SVO','AER');
+insert into ada.flight(fn, airline, price, afrom, ato) values ('SU02', 'AFL', 22000, 'SVO','IST');
+insert into ada.flight(fn, airline, price, afrom, ato) values ('SU03', 'AFL', 20000, 'TJM','SVO');
+insert into ada.flight(fn, airline, price, afrom, ato) values ('SU04', 'AFL', 15000, 'AER','IST');
+insert into ada.flight(fn, airline, price, afrom, ato) values ('R201', 'SDM', 12000, 'TJM','VKO');
+insert into ada.flight(fn, airline, price, afrom, ato) values ('UT01', 'UTA', 11000, 'TJM','VKO');
+insert into ada.flight(fn, airline, price, afrom, ato) values ('UT02', 'UTA', 10000, 'VKO','AER');
+insert into ada.flight(fn, airline, price, afrom, ato) values ('R202', 'SDM', 18000, 'VKO','IST');
+insert into ada.flight(fn, airline, price, afrom, ato) values ('SU05', 'AFL', 4500, 'SVO','SPB');
+insert into ada.flight(fn, airline, price, afrom, ato) values ('SU06', 'AFL', 9500, 'SPB','AER');
+```

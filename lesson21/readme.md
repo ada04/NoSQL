@@ -148,4 +148,3 @@ explain match (from:town {name: 'Moscow'}), (to:town), path = (from) -[:ton {typ
 
 ![neo4j_query_plan_2024-3-6 (1)](https://github.com/ada04/NoSQL/assets/40420948/75b8e0bf-54aa-4c7c-873c-52458730d9a2)
 
-![image](https://github.com/ada04/NoSQL/assets/40420948/57282d9d-64fc-43f8-907d-a2c46915b2d4)

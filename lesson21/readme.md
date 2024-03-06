@@ -115,6 +115,9 @@ create (msk) -[:ton {type: 'land', by: 'auto'}]-> (msk)
 ```
 Created 32 nodes, created 49 relationships, set 88 properties, added 32 labels
 
+![image](https://github.com/ada04/NoSQL/assets/40420948/598846ec-e0e5-4bec-aa7e-032e78964f3b)
+
+запрос, который бы выводил направление (со всеми промежуточными точками), который можно осуществить только наземным транспортом.
 
 ```cypher
 ```

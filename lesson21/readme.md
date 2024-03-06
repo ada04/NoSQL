@@ -120,20 +120,32 @@ Created 32 nodes, created 49 relationships, set 88 properties, added 32 labels
 запрос, который бы выводил направление (со всеми промежуточными точками), который можно осуществить только наземным транспортом.
 
 ```cypher
+match (from:town {name: 'Moscow'}), (to:town), path = (from) -[:ton {type: 'land'}]-> (to) return path
 ```
 
+![image](https://github.com/ada04/NoSQL/assets/40420948/92a53fb5-2ce1-455a-980a-d02d0e94eae7)
+
+Составить план запроса
 
 ```cypher
+explain match (from:town {name: 'Moscow'}), (to:town), path = (from) -[:ton {type: 'land'}]-> (to) return path
 ```
 
+![neo4j_query_plan_2024-3-6](https://github.com/ada04/NoSQL/assets/40420948/12c0605f-2331-4dc3-8c45-a4b34ac74495)
+
+
+Добавить индексы для оптимизации запроса
 
 ```cypher
+create index on for (n:town) on (n.name)
 ```
 
+Еще раз посмотреть план запроса и убедиться, что индексыпозволили оптимизировать запрос
 
 ```cypher
+explain match (from:town {name: 'Moscow'}), (to:town), path = (from) -[:ton {type: 'land'}]-> (to) return path
 ```
 
+![neo4j_query_plan_2024-3-6 (1)](https://github.com/ada04/NoSQL/assets/40420948/75b8e0bf-54aa-4c7c-873c-52458730d9a2)
 
-```cypher
-```
+![image](https://github.com/ada04/NoSQL/assets/40420948/57282d9d-64fc-43f8-907d-a2c46915b2d4)

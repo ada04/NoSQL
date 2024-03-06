@@ -31,6 +31,11 @@
 ### Создание нод и связей
 
 ```cypher
+create (tt:Company {name: 'TezTour', www: 'https://www.tez-tour.travel/'})
+create (int:Company {name: 'Intourist', www: 'https://intourist.ru/'})
+create (peg:Company {name: 'Pegas', www: 'https://pegastt.ru/'})
+create (cor:Company {name: 'Coral', www: 'https://www.coral.ru/'})
+create (msk:Town {name:'Moscow
 
 ```
 

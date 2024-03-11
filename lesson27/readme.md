@@ -1,6 +1,6 @@
 # Урок 27 - Архитектура Tarantool 
 
-
+# ДЗ не выполнено, т.к. в уроке недостаточно информации для его выполгнения. Команды в задании некорректные и отличаются от возможных... Урок без практики 
 
 # Домашнее задание
 
@@ -35,17 +35,23 @@ docker run -it --rm tarantool/tarantool
 #### Установка из репозитория
 Добавим репозиторий
 ```bash
-curl -L https://tarantool.io/BraKbmW/release/3/installer.sh | bash
+curl -L https://tarantool.io/BraKbmW/release/2/installer.sh | bash
 ```
 
-Усановка tarantool из репозитория (вдруг пригодится)
+Усановка tarantool из репозитория 
 ```bash
-sudo apt-get -y install tarantool
+apt-get -y install tarantool
 ```
 
-Устанавливает ttCLI
+To enable the completion for tt commands
 ```bash
-apt-get install tt
+. <(tt completion bash)
+```
+
+```bash
+tt start
+tt cartridge create --name myapp
+
 ```
 
 ##### Подготавливаем настройки

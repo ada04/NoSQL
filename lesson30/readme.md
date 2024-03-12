@@ -24,3 +24,27 @@
  
 ## Описание/Пошаговая инструкция выполнения домашнего задания:
 
+В YC создвем ВМ с доступом извне и подключаемся к ней
+
+Подключаем DEB-репозиторий
+
+```bash
+sudo apt update && sudo apt install --yes apt-transport-https ca-certificates dirmngr && \
+sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 8919F6BD******** && \
+echo "deb https://packages.clickhouse.com/deb stable main" | sudo tee \
+/etc/apt/sources.list.d/clickhouse.list
+```
+
+Устанавливаем зависимости и клиентское приложение clickhouse-client
+
+```bash
+sudo apt update && sudo apt install --yes clickhouse-client
+```
+
+Загружаем файл конфигурации для clickhouse-client
+
+```bash
+mkdir -p ~/.clickhouse-client && \
+wget "https://storage.yandexcloud.net/doc-files/clickhouse-client.conf.example" \
+  --output-document ~/.clickhouse-client/config.xml
+```

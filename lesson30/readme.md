@@ -374,85 +374,59 @@ SAMPLE BY intHash32(UserID)
 У нас загружены файлы в формате со значениями, разделёнными знаком табуляции; импортируем их, указав соответствующие запросы в аргументах командной строки:
 
 ```bash
-clickhouse-client --query "INSERT INTO test1.hits_v1 FORMAT TSV" --max_insert_block_size=100000 < hits_v1.tsv -- user user1 --password 4v6-n2C-3Gm-Fm3 --database db1
-clickhouse-client --query "INSERT INTO test1.visits_v1 FORMAT TSV" --max_insert_block_size=100000 < visits_v1.tsv  --password 4v6-n2C-3Gm-Fm3
+clickhouse-client --query "INSERT INTO hits_v1 FORMAT TSV" --max_insert_block_size=100000 < hits_v1.tsv --user user1 --password 4v6-n2C-3Gm-Fm3 --database db1 --port 9440 --secure --host rc1b-rlc7qkuh7cgoq7fp.mdb.yandexcloud.net
+
+clickhouse-client --query "INSERT INTO visits_v1 FORMAT TSV" --max_insert_block_size=100000 < visits_v1.tsv  --user user1 --password 4v6-n2C-3Gm-Fm3 --database db1 --port 9440 --secure --host rc1b-rlc7qkuh7cgoq7fp.mdb.yandexcloud.net
 ```
 
-Посмотреть какие настройки доступны, что они означают и какие у них значения по умолчанию можно в таблице system.settings:
+После импорта применим к таблицам оператор OPTIMIZE. 
 
 ```sql
-SELECT name, value, changed, description
-FROM system.settings
-WHERE name LIKE '%max_insert_b%'
-FORMAT TSV
-```
-
-После импорта применим к таблицам оператор OPTIMIZE. Этот оператор принудительно запускает соответствующие процессы слияния вместо того, чтобы эти действия были выполнены в фоне когда-нибудь позже.
-
-```sql
-OPTIMIZE TABLE test1.hits_v1 FINAL
-OPTIMIZE TABLE test1.visits_v1 FINAL
+OPTIMIZE TABLE hits_v1 FINAL
+OPTIMIZE TABLE visits_v1 FINAL
 ```
 
 Проверим, успешно ли загрузились данные:
 
 ```sql
-SELECT COUNT(*) FROM test1.hits_v1
-SELECT COUNT(*) FROM test1.visits_v1
+SELECT COUNT(*) FROM hits_v1
+SELECT COUNT(*) FROM visits_v1
 ```
 
-```
-ubuntu2204.localdomain :) SELECT COUNT(*) FROM test1.hits_v1
+![image](https://github.com/ada04/NoSQL/assets/40420948/111caa1b-57fb-485a-b403-643ea230a09d)
 
-SELECT COUNT(*)
-FROM test1.hits_v1
+![image](https://github.com/ada04/NoSQL/assets/40420948/e74e1a6f-fcb5-416e-a8ce-a97af7edc3a7)
 
-Query id: 9740aca5-c3f7-4d99-8156-b80919d4dde1
-
-┌─count()─┐
-│ 8873898 │
-└─────────┘
-
-1 row in set. Elapsed: 0.046 sec.
-
-ubuntu2204.localdomain :) SELECT COUNT(*) FROM test1.visits_v1
-
-SELECT COUNT(*)
-FROM test1.visits_v1
-
-Query id: 1ad4e149-c4b0-4bb8-8728-8d84cb5dfedd
-
-┌─count()─┐
-│ 1676861 │
-└─────────┘
-
-1 row in set. Elapsed: 0.004 sec.
-
-ubuntu2204.localdomain :)
-```
-
-Примеры запросов
+#### Примеры запросов
 
 ```sql
 SELECT
     StartURL AS URL,
     AVG(Duration) AS AvgDuration
-FROM test1.visits_v1
+FROM visits_v1
 WHERE StartDate BETWEEN '2014-03-20' AND '2014-03-22'
 GROUP BY URL
 ORDER BY AvgDuration DESC
 LIMIT 10
+```
 
+![image](https://github.com/ada04/NoSQL/assets/40420948/f9b10d0e-c0d2-42c2-b884-ba8458487c58)
+
+
+```sql
 SELECT
     sum(Sign) AS visits,
     sumIf(Sign, has(Goals.ID, 1105530)) AS goal_visits,
     (100. * goal_visits) / visits AS goal_percent
-FROM test1.visits_v1
+FROM visits_v1
 WHERE (CounterID = 912887) AND (toYYYYMM(StartDate) = 201403)
 ```
 
-Полный лог создания БД и импорта: [Log](./out_02.log))
-Несмотря на большое количество записей и работу ClickHouse в ВМ на обычном ПК, время выполнения запросов составило 0.271 и 0.041 сек.
+![image](https://github.com/ada04/NoSQL/assets/40420948/68efeabe-59c5-47cd-881b-95804c69accd)
+
+
+### Сравнительный вывод
+в ВМ на обычном ПК, время выполнения запросов составило 0.271 и 0.041 сек, в облаке 0.222 и 0.007 cек соответственно.
 
 ## Создание дополнительной тестовой БД (https://clickhouse.com/docs/en/getting-started/example-datasets) , протестировать скорость запросов
 
@@ -469,10 +443,7 @@ unzip dataset.zip
 #### Создадим БД и таблицу
 
 ```sql
-CREATE DATABASE test2
-COMMENT 'Database for testb OTUS'
-
-CREATE TABLE test2.recipes
+CREATE TABLE recipes
 (
     title String,
     ingredients Array(String),
@@ -489,7 +460,7 @@ CREATE TABLE test2.recipes
 
 ```bash
 clickhouse-client --query "
-    INSERT INTO test2.recipes
+    INSERT INTO recipes
     SELECT
         title,
         JSONExtract(ingredients, 'Array(String)'),
@@ -499,7 +470,7 @@ clickhouse-client --query "
         JSONExtract(NER, 'Array(String)')
     FROM input('num UInt32, title String, ingredients String, directions String, link String, source LowCardinality(String), NER String')
     FORMAT CSVWithNames
-" --input_format_with_names_use_header 0 --format_csv_allow_single_quote 0 --input_format_allow_errors_num 10 < dataset/full_dataset.csv --password aa2024
+" --input_format_with_names_use_header 0 --format_csv_allow_single_quote 0 --input_format_allow_errors_num 10 < dataset/full_dataset.csv --host rc1b-rlc7qkuh7cgoq7fp.mdb.yandexcloud.net --secure --user user1 --database db1 --port 9440 --password 4v6-n2C-3Gm-Fm3
 ```
 
 **Пояснение:**
@@ -518,18 +489,11 @@ clickhouse-client --query "
 
 ```sql
 SELECT count()
-FROM test2.recipes
+FROM recipes
 ```
 
-```
-Query id: b8885c20-2ba5-4ae4-a359-e947f7b0052f
+![image](https://github.com/ada04/NoSQL/assets/40420948/63f2ffcb-1493-4a21-b05f-1d265234619a)
 
-┌─count()─┐
-│ 2231142 │
-└─────────┘
-
-1 row in set. Elapsed: 0.002 sec.
-```
 
 #### Примеры запросов
 
@@ -539,28 +503,17 @@ Query id: b8885c20-2ba5-4ae4-a359-e947f7b0052f
 SELECT
     arrayJoin(NER) AS ingridient,
     count() AS cnt
-FROM test2.recipes
+FROM recipes
 GROUP BY ingridient
 ORDER BY cnt DESC
 LIMIT 10
 ```
 
-```
-Query id: 49628135-2fd9-4e26-a40e-f8cff4e55db1
+![image](https://github.com/ada04/NoSQL/assets/40420948/649538c2-6fa0-4f45-9f94-e91f6efe740a)
 
-┌─ingridient─┬────cnt─┐
-│ salt       │ 890741 │
-│ sugar      │ 620027 │
-│ butter     │ 493823 │
-│ flour      │ 466110 │
-│ eggs       │ 401276 │
-│ onion      │ 372469 │
-│ garlic     │ 358364 │
-│ milk       │ 346769 │
-│ water      │ 326092 │
-│ vanilla    │ 270381 │
-└────────────┴────────┘
-```
+10 rows in set. Elapsed: 0.514 sec. Processed 2.23 million rows, 361.57 MB (4.34 million rows/s., 703.21 MB/s.)
+Peak memory usage: 32.91 MiB.
+
 
 Самые сложные рецепты с яйцами
 
@@ -569,40 +522,42 @@ SELECT
     title,
     length(NER),
     length(directions)
-FROM test2.recipes
+FROM recipes
 WHERE has(NER, 'eggs')
 ORDER BY length(directions) DESC
 LIMIT 5;
 ```
 
-```
-Query id: 91a15db0-0b93-447a-9e9f-8759bbb60413
+![image](https://github.com/ada04/NoSQL/assets/40420948/779d754d-e52c-4249-8bba-85e264698702)
 
-┌─title─────────────────────────────┬─length(NER)─┬─length(directions)─┐
-│ Soft Cheesy Pretzel               │           9 │                151 │
-│ Cannelloni with Asparagus and Ham │          13 │                148 │
-│ Making Egg Dough Pastas           │          18 │                145 │
-│ Gingerbread House                 │          15 │                133 │
-│ Birch De Noel Recipe              │          20 │                126 │
-└───────────────────────────────────┴─────────────┴────────────────────┘
+5 rows in set. Elapsed: 1.435 sec. Processed 2.23 million rows, 1.65 GB (1.55 million rows/s., 1.15 GB/s.)
+Peak memory usage: 30.95 MiB.
 
-5 rows in set. Elapsed: 5.091 sec. Processed 2.23 million rows, 1.65 GB (438.21 thousand rows/s., 324.21 MB/s.)
-Peak memory usage: 29.06 MiB.
-```
-
-10 rows in set. Elapsed: 0.215 sec. Processed 2.23 million rows, 1.48 GB (10.35 million rows/s., 6.86 GB/s.)
-
-В этом примере используется функция has для проверки вхождения элемента в массив, а также сортировка по количеству шагов (length(directions)).
 
 Существует свадебный торт, который требует целых 126 шагов для производства! Рассмотрим эти шаги:
 
 ```sql
 SELECT arrayJoin(directions)
-FROM test2.recipes
+FROM recipes
 WHERE title = 'Chocolate-Strawberry-Orange Wedding Cake';
 ```
-Результат этого запроса и полный лог в [Log](./out_03.log))
 
+126 rows in set. Elapsed: 0.016 sec. Processed 39.24 thousand rows, 7.80 MB (2.50 million rows/s., 497.48 MB/s.)
+Peak memory usage: 11.98 MiB.
 
+### Сравнительный вывод по 2 части
 
+#### Время выполнения запросов на ВМ: 
+
+10 rows in set. Elapsed: 0.215 sec. Processed 2.23 million rows, 1.48 GB (10.35 million rows/s., 6.86 GB/s.)
+5 rows in set. Elapsed: 5.091 sec. Processed 2.23 million rows, 1.65 GB (438.21 thousand rows/s., 324.21 MB/s.)
+126 rows in set. Elapsed: 0.016 sec. Processed 39.24 thousand rows, 7.80 MB (2.51 million rows/s., 499.22 MB/s.)
+
+#### Время выполнения запросов в YC
+
+10 rows in set. Elapsed: 0.514 sec. Processed 2.23 million rows, 361.57 MB (4.34 million rows/s., 703.21 MB/s.)
+5 rows in set. Elapsed: 1.435 sec. Processed 2.23 million rows, 1.65 GB (1.55 million rows/s., 1.15 GB/s.)
+126 rows in set. Elapsed: 0.016 sec. Processed 39.24 thousand rows, 7.80 MB (2.50 million rows/s., 497.48 MB/s.)
+
+**Разница конечно есть, но на моих тестовых данных не очень заметна :)**
 

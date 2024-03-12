@@ -24,6 +24,8 @@
  
 ## Описание/Пошаговая инструкция выполнения домашнего задания:
 
+[QuickStart](https://cloud.yandex.ru/ru/docs/managed-clickhouse/quickstart)
+
 ### Создание ВМ для клиентской части
 
 В YC создвем ВМ с доступом извне и подключаемся к ней
@@ -61,5 +63,53 @@ wget "https://storage.yandexcloud.net/doc-files/clickhouse-client.conf.example" 
 - Задаем параметры кластера и нажимаем кнопку Создать кластер.
 - Дожидаемся, когда кластер будет готов к работе: его статус на панели Managed Service for ClickHouse® сменится на Running, а состояние — на Alive. Это может занять некоторое время.
 
+### Подключаемся к БД
 
+Для подключения к серверу БД получаем SSL-сертификаты:
 
+```bash
+sudo mkdir --parents /usr/local/share/ca-certificates/Yandex/ && \
+sudo wget "https://storage.yandexcloud.net/cloud-certs/RootCA.pem" \
+     --output-document /usr/local/share/ca-certificates/Yandex/RootCA.crt && \
+sudo wget "https://storage.yandexcloud.net/cloud-certs/IntermediateCA.pem" \
+     --output-document /usr/local/share/ca-certificates/Yandex/IntermediateCA.crt && \
+sudo chmod 655 \
+     /usr/local/share/ca-certificates/Yandex/RootCA.crt \
+     /usr/local/share/ca-certificates/Yandex/IntermediateCA.crt && \
+sudo update-ca-certificates
+```
+
+Сертификаты будут сохранены в файлах:
+
+    /usr/local/share/ca-certificates/Yandex/RootCA.crt
+    /usr/local/share/ca-certificates/Yandex/IntermediateCA.crt
+
+Используем для подключения ClickHouse® CLI, для этого укажем путь к SSL-сертификату RootCA.crt в конфигурационном файле, в элементе <caConfig>:
+
+```
+<config>
+  <openSSL>
+    <client>
+      <loadDefaultCAFile>true</loadDefaultCAFile>
+      <caConfig>/usr/local/share/ca-certificates/Yandex/RootCA.crt</caConfig>
+      <cacheSessions>true</cacheSessions>
+      <disableProtocols>sslv2,sslv3</disableProtocols>
+      <preferServerCiphers>true</preferServerCiphers>
+      <invalidCertificateHandler>
+        <name>RejectCertificateHandler</name>
+      </invalidCertificateHandler>
+    </client>
+  </openSSL>
+</config>
+```
+
+Запустиv ClickHouse® CLI со следующими параметрами:
+
+```bash
+clickhouse-client --host <FQDN_любого_хоста_ClickHouse®> \
+                  --secure \
+                  --user user1 \
+                  --database <имя_БД> \
+                  --port 9440 \
+                  --ask-password
+```

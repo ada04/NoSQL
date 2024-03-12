@@ -24,15 +24,17 @@
  
 ## Описание/Пошаговая инструкция выполнения домашнего задания:
 
+### Создание ВМ для клиентской части
+
 В YC создвем ВМ с доступом извне и подключаемся к ней
 
 Подключаем DEB-репозиторий
 
 ```bash
-sudo apt update && sudo apt install --yes apt-transport-https ca-certificates dirmngr && \
-sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 8919F6BD******** && \
+sudo apt-get install -y apt-transport-https ca-certificates dirmngr
+sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 8919F6BD2B48D754
 echo "deb https://packages.clickhouse.com/deb stable main" | sudo tee \
-/etc/apt/sources.list.d/clickhouse.list
+    /etc/apt/sources.list.d/clickhouse.list
 ```
 
 Устанавливаем зависимости и клиентское приложение clickhouse-client
@@ -48,3 +50,14 @@ mkdir -p ~/.clickhouse-client && \
 wget "https://storage.yandexcloud.net/doc-files/clickhouse-client.conf.example" \
   --output-document ~/.clickhouse-client/config.xml
 ```
+
+### Создание кластера
+
+- В консоли управления выбираем каталог, в котором нужно создать кластер БД.
+- Выбираем сервис Managed Service for ClickHouse.
+- Нажимаем кнопку Создать кластер.
+- Задаем параметры кластера и нажимаем кнопку Создать кластер.
+- Дожидаемся, когда кластер будет готов к работе: его статус на панели Managed Service for ClickHouse® сменится на Running, а состояние — на Alive. Это может занять некоторое время.
+
+
+

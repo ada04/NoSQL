@@ -109,15 +109,10 @@ sudo update-ca-certificates
 Запустиv ClickHouse® CLI со следующими параметрами:
 
 ```bash
-clickhouse-client --host rc1b-rlc7qkuh7cgoq7fp.mdb.yandexcloud.net \
-                  --secure \
-                  --user user1 \
-                  --database db1 \
-                  --port 9440 \
-                  --ask-password
+clickhouse-client --host rc1b-rlc7qkuh7cgoq7fp.mdb.yandexcloud.net --secure --user user1 --database db1 --port 9440 --password 4v6-n2C-3Gm-Fm3
 ```
 
-4v6-n2C-3Gm-Fm3
+
 
 ![image](https://github.com/ada04/NoSQL/assets/40420948/b323aea5-87c4-4438-99af-266758668230)
 
@@ -379,8 +374,8 @@ SAMPLE BY intHash32(UserID)
 У нас загружены файлы в формате со значениями, разделёнными знаком табуляции; импортируем их, указав соответствующие запросы в аргументах командной строки:
 
 ```bash
-clickhouse-client --query "INSERT INTO test1.hits_v1 FORMAT TSV" --max_insert_block_size=100000 < hits_v1.tsv --password aa2024
-clickhouse-client --query "INSERT INTO test1.visits_v1 FORMAT TSV" --max_insert_block_size=100000 < visits_v1.tsv  --password aa2024
+clickhouse-client --query "INSERT INTO test1.hits_v1 FORMAT TSV" --max_insert_block_size=100000 < hits_v1.tsv -- user user1 --password 4v6-n2C-3Gm-Fm3 --database db1
+clickhouse-client --query "INSERT INTO test1.visits_v1 FORMAT TSV" --max_insert_block_size=100000 < visits_v1.tsv  --password 4v6-n2C-3Gm-Fm3
 ```
 
 Посмотреть какие настройки доступны, что они означают и какие у них значения по умолчанию можно в таблице system.settings:

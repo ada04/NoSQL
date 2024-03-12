@@ -63,6 +63,9 @@ wget "https://storage.yandexcloud.net/doc-files/clickhouse-client.conf.example" 
 - Задаем параметры кластера и нажимаем кнопку Создать кластер.
 - Дожидаемся, когда кластер будет готов к работе: его статус на панели Managed Service for ClickHouse® сменится на Running, а состояние — на Alive. Это может занять некоторое время.
 
+![image](https://github.com/ada04/NoSQL/assets/40420948/fe431966-d032-4967-b97a-d08beef37085)
+
+
 ### Подключаемся к БД
 
 Для подключения к серверу БД получаем SSL-сертификаты:
@@ -106,10 +109,14 @@ sudo update-ca-certificates
 Запустиv ClickHouse® CLI со следующими параметрами:
 
 ```bash
-clickhouse-client --host <FQDN_любого_хоста_ClickHouse®> \
+clickhouse-client --host rc1b-rlc7qkuh7cgoq7fp.mdb.yandexcloud.net \
                   --secure \
                   --user user1 \
-                  --database <имя_БД> \
+                  --database db1 \
                   --port 9440 \
                   --ask-password
 ```
+
+![image](https://github.com/ada04/NoSQL/assets/40420948/b323aea5-87c4-4438-99af-266758668230)
+
+

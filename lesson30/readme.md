@@ -53,6 +53,8 @@ wget "https://storage.yandexcloud.net/doc-files/clickhouse-client.conf.example" 
 
 ### Создание кластера
 
+[Дока](https://cloud.yandex.ru/ru/docs/managed-clickhouse/operations/cluster-create)
+
 - В консоли управления выбираем каталог, в котором нужно создать кластер БД.
 - Выбираем сервис Managed Service for ClickHouse.
 - Нажимаем кнопку Создать кластер.

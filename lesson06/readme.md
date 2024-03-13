@@ -22,3 +22,16 @@ https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-ubuntu/
 Проверяем версию ОС:
 
     cat /etc/lsb-release
+
+
+
+--ЯО
+```
+yc compute instance create \
+  --name mongo-instance \
+  --hostname mongo-instance \
+  --create-boot-disk size=15G,type=network-ssd,image-folder-id=standard-images,image-family=ubuntu-2204-lts \
+  --network-interface subnet-name=default-ru-central1-b,nat-ip-version=ipv4 \
+  --zone ru-central1-b \
+  --metadata-from-file ssh-keys=/home/ada/.ssh/id_rsa.pub
+```
